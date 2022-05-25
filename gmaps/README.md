@@ -26,11 +26,11 @@ You will need an API key for this.
 Working Directory on your local machine or VM should be as follows:
 
 ```
-|---read_data.ipynb
 |---classified_images/
 |------.png files
 |---write_data/
 |------name_class.txt
+|---source_images/
 |---read_data.ipynb
 |---move_classify.ipynb
 |---download_images.ipynb

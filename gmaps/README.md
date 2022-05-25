@@ -2,11 +2,11 @@
 
 ### 5 Part Process to download, classify, and read in data
 
-This process will just update the file `data_write/name_class.txt`. You just need to ensure that before you run this program you pull the latest version of it, and that after you are done you upload all the images from `classified_images` to the Google Drive Data folder. (Drive >> Data >> GoogleMaps >> temp >> classified_images).
+This process will just update the file `data_write/name_class.txt` and store classifed images in the appropriate folder.
 
 Steps:
 
-1. Move all the images in Drive >> Data >> GoogleMaps >> temp >> classified_images to your cloned repo, also to the `classified_images` folder
+1. Make sure you pull the latest verstion of `data_write/name_class.txt`. Move all the images in Drive >> Data >> GoogleMaps >> temp >> classified_images to your cloned repo, also to the `classified_images` folder.
 
 
 2. Use `download_images.ipynb` to download images using the google maps API. This will save them into the `source_images` folder.

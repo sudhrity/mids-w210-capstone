@@ -1,0 +1,6 @@
+.DS_Store
+.ipynb_checkpoints/
+classified_images/*
+!classified_images/README.md
+source_images/*
+!source_images/README.md

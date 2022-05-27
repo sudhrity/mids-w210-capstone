@@ -49,15 +49,20 @@ def classify_images(image_source, destination_folder, name_class_file):
             print('PROCESS STOPPED')
             break
         elif clss == '1':
-            with open(name_class_file, 'a') as f:
-                f.write(i+',1' + '\n')
+            try:
+                shutil.move(f'./source_images/{i}', './classified_images/lawn/')
+                with open(name_class_file, 'a') as f:
+                    f.write(i+',1' + '\n')
+            except:
+                continue
         else:
-            with open(name_class_file, 'a') as f:
-                f.write(i+',0' + '\n')
-        
-
-        shutil.move(f'./source_images/{i}', './classified_images/')
-    
+            try:
+                shutil.move(f'./source_images/{i}', './classified_images/no_lawn/')
+                with open(name_class_file, 'a') as f:
+                    f.write(i+',0' + '\n')
+            except:
+                continue
+            
         clear_output()
     
     return

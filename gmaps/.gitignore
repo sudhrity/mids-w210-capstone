@@ -1,8 +1,0 @@
-.DS_Store
-.ipynb_checkpoints/
-classified_images/lawn/*
-!classified_images/lawn/README.md
-classified_images/no_lawn/*
-!classified_images/no_lawn/README.md
-source_images/*
-!source_images/README.md

@@ -1,9 +1,11 @@
-import googlemaps
-from haversine import haversine, Unit, inverse_haversine, Direction
+import os
 import itertools
-import requests
 import re
 import math
+
+import requests
+import googlemaps
+from haversine import haversine, Unit, inverse_haversine, Direction
 
 def get_four_corners(center):
     '''
@@ -11,6 +13,13 @@ def get_four_corners(center):
     out: a dictionary containing the gps coordinates of the 4 corners 
             of the square mile area around the input
     '''
+    
+    # Save the center coodinate to the center_coordinates.txt
+    rel_path = 'data_write/center_coordinates.txt'
+    path = os.path.abspath(os.path.join(os.getcwd(), rel_path))
+            
+    with open(path, "a") as file:
+        file.write(f"{','.join(list(map(str,center)))}")
     
     top = inverse_haversine(center, .5, Direction.NORTH, unit='mi')
     nw = inverse_haversine(top, .5, Direction.WEST, unit='mi')
@@ -51,10 +60,8 @@ def get_coord_list(coord_dict, dim):
     
     return coord_combos
 
-def extract_str_coord(coords):
+def _extract_str_coord(coords):
     return (re.sub('[()\s]', '', str(coords)))
-
-
 
 def produce_image(coordinate, target_folder,key, zoom =20, size =500):
     # base URL 
@@ -62,7 +69,7 @@ def produce_image(coordinate, target_folder,key, zoom =20, size =500):
 
     ################## PARAMETERS ########################
     # coordinates
-    COORD = extract_str_coord(coordinate) #test image somewhere in LA with a lot of lawns
+    COORD = _extract_str_coord(coordinate) #test image somewhere in LA with a lot of lawns
     
     API_KEY = key
 

@@ -2,6 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import time
+import random
 
 #system imports
 import os
@@ -10,39 +11,50 @@ import os
 from PIL import Image
 from skimage.transform import resize
 
-def read_flatten_image(image):
-    im = Image.open(image)
-    im_rgb = im.convert('RGB')
-    arr_200 = resize(np.array(im_rgb), (200,200,3))
-    r = arr_200[:,:,0].flatten()
-    g = arr_200[:,:,1].flatten()
-    b = arr_200[:,:,2].flatten()
-    return np.dstack([r,g,b])
+      
+def load_gmaps_data(main_images_dir, dimension):
 
-def get_classes(name_class_file):
-    with open(name_class_file) as f:
-        l = f.read().splitlines()
-    names = [i[:-2] for i in l]
-    classes = [int(i[-1]) for i in l]
-    print(f'Returned {len(names)} items to each list')
-    return(names, classes)
+    lawn_dir = 'lawn/'
+    no_lawn_dir = 'no_lawn/'
+
+    lawn_path = os.path.join(main_images_dir, lawn_dir)
+    no_lawn_path = os.path.join(main_images_dir, no_lawn_dir)
+
+
+    positive_data = []
+    negative_data = []
     
-    
-def load_gmaps_images(image_folder, image_names):
-    data = []
     start = time.time()
-    for file_name in image_names:
-        data.append(read_flatten_image(f'classified_images/{file_name}'))
-    end = time.time()
-    print(f'{len(image_names)} images loaded in {end-start:.4f} seconds.')
+    for i in os.listdir(no_lawn_path):
+        if i[-3:] == 'png':
+            im = Image.open(f'{no_lawn_path}/{i}').convert('RGB')
+            im_resized = resize(np.array(im), (dimension,dimension,3))
+            negative_data.append((im_resized,0))
+
+
+    for i in os.listdir(lawn_path):
+        if i[-3:] == 'png':
+            im = Image.open(f'{lawn_path}/{i}').convert('RGB')
+            im_resized = resize(np.array(im), (dimension,dimension,3))
+            positive_data.append((im_resized,1))
+
+
+    all_data = positive_data+negative_data
+    random.shuffle(all_data)
+
+    X = np.array([i[0] for i in all_data])
+    y = np.array([i[1] for i in all_data])
     
-    return(data)
+    end = time.time()
+    
+    print(f'Loaded {X.shape[0]} images in {(end-start):.4f} seconds')
+    print(f'Positive Images: {y.sum()}')
+    print(f'Negative Images: {y.shape[0]-y.sum()}')
+    print(f'Class Ratio: {y.mean():.4f}')
+    
+    return X, y
 
 
-def display_image(index, list_of_photos):
+def display_image(data, index):
     '''plots the image'''
-    return plt.imshow(list_of_photos[index].reshape(200,200,3))
-
-def get_photo_array(index, list_of_photos):
-    '''returns the vector for the RGB converted photo'''
-    return np.array(list_of_photos[index].reshape(200,200,3))
+    return plt.imshow(data[index])

@@ -1,9 +1,9 @@
 .DS_Store
 .ipynb_checkpoints/
 __pycache__/
-gmaps/classified_images/lawn/*
-!gmaps/classified_images/lawn/README.md
-gmaps/classified_images/no_lawn/*
-!gmaps/classified_images/no_lawn/README.md
-gmaps/source_images/*
-!gmaps/source_images/README.md
+gmaps_data/classified_images/lawn/*
+!gmaps_data/classified_images/lawn/README.md
+gmaps_data/classified_images/no_lawn/*
+!gmaps_data/classified_images/no_lawn/README.md
+gmaps_data/source_images/*
+!gmaps_data/source_images/README.md

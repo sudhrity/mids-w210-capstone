@@ -1,0 +1,35 @@
+{
+  "path": {
+    "Md": [
+      {
+        "lat": 34.2156,
+        "lng": -118.5535
+      },
+      {
+        "lat": 34.2157,
+        "lng": -118.5492
+      },
+      {
+        "lat": 34.2138,
+        "lng": -118.5492
+      },
+      {
+        "lat": 34.2138,
+        "lng": -118.5535
+      },
+      {
+        "lat": 34.2147,
+        "lng": -118.5525
+      }
+    ],
+    "gm_accessors_": {
+      "length": {}
+    },
+    "length": 5,
+    "gm_bindings_": {
+      "length": {}
+    }
+  },
+  "encodedPath": "uvyoEl~qrUG}YpJ@?tYgD_E",
+  "randomValue": 0.6498
+}

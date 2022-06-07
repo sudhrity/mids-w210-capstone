@@ -2,24 +2,24 @@
   "path": {
     "Md": [
       {
-        "lat": 34.2156,
-        "lng": -118.5535
+        "lat": 34.2206,
+        "lng": -118.5448
+      },
+      {
+        "lat": 34.2207,
+        "lng": -118.5361
+      },
+      {
+        "lat": 34.2158,
+        "lng": -118.5359
+      },
+      {
+        "lat": 34.2138,
+        "lng": -118.5408
       },
       {
         "lat": 34.2157,
-        "lng": -118.5492
-      },
-      {
-        "lat": 34.2138,
-        "lng": -118.5492
-      },
-      {
-        "lat": 34.2138,
-        "lng": -118.5535
-      },
-      {
-        "lat": 34.2147,
-        "lng": -118.5525
+        "lng": -118.5448
       }
     ],
     "gm_accessors_": {
@@ -30,6 +30,6 @@
       "length": {}
     }
   },
-  "encodedPath": "uvyoEl~qrUG}YpJ@?tYgD_E",
-  "randomValue": 0.6498
+  "encodedPath": "}uzoE|gprUMeu@z]a@jKp]wJ|W",
+  "randomValue": 0.6121
 }

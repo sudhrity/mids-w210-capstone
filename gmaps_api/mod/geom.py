@@ -7,27 +7,20 @@ import json
 router2 = APIRouter()
 
 
-@router2.get("/folder={folder_name}&file={filename}")
-async def get_area(folder_name, filename):
+# @router2.get("/folder={folder_name}&file={filename}")
+@router2.get("/{json_data}")
+async def get_area(json_data):
     '''
     returns the area of the coordinate space in the target json file
 
-    in: data folder name, file name
-    out: area of polygon defined in json data (square meters)
+    in: json data with coordinates under ['path']['Md'] item
+    out: area of polygon defined in json data (square meters), plus number of vertices
 
-    router extension: /geometry
-    e.g. base_url/geometry/folder=json_data&file=poly5
+    router extension: /polygon
+    e.g. base_url/polygon/{data}
     '''
 
-    #look for data in target folder, create filepath
-    filepath = folder_name + '/' + filename + '.json'
-
-    #open file, load json data as dictionary
-    with open(filepath) as j:
-        data = json.load(j)
-
-    #extract just coordinates from json data
-    coords = data['path']['Md']
+    coords = json.loads(json_data)['path']['Md']
     coord_list = [[]]
 
     #append all coordinates to coordinate list, with first and last points being the same
@@ -44,4 +37,7 @@ async def get_area(folder_name, filename):
 
     #calculate and return area
     obj = {'type':'Polygon','coordinates':coord_list}
-    return ({'sq_meters': str(area(obj))})
+    return ({
+            'square_meters': area(obj),
+            'polygon_shape': len(coords)
+             })

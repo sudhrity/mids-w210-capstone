@@ -102,7 +102,7 @@ def within(point, bounds):
     polygon = Polygon(bounds)
     return polygon.contains(point)
 
-@router2.get("/{json_data}") 
+@router2.get("/{json_data}")
 async def get_sample(json_data):
     meters = get_area(json_data)
     poly_verts = polygon_vertices(json_data)

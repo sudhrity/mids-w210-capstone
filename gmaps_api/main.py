@@ -3,7 +3,6 @@ import uvicorn
 from pydantic import BaseModel
 
 #custom imports
-from mod.apikey import get_api_key
 from mod.predict_tf import router1
 from mod.poly import router2
 

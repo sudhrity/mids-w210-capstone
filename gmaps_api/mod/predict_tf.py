@@ -9,9 +9,6 @@ from tensorflow import keras
 from skimage.transform import resize
 from PIL import Image
 
-#custom imports
-from mod.apikey import get_api_key
-
 
 #create API router to feed into main.py
 router1 = APIRouter() #ROUTER PREFIX = /predict_tf

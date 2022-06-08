@@ -4,13 +4,14 @@ from pydantic import BaseModel
 
 #custom imports
 from mod.apikey import get_api_key
-from mod.predict_image import router1
+from mod.predict_tf import router1
 from mod.poly import router2
+
 
 app = FastAPI()
 
-#import router to download images via gmaps api
-app.include_router(router1, prefix = '/predict_image')
+#import router to output a classification with a tensorflow model
+app.include_router(router1, prefix = '/predict_tf')
 #import router to get square meters of coordinate space
 app.include_router(router2, prefix = '/polygon')
 

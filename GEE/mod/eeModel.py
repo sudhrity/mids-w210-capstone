@@ -1,5 +1,5 @@
 import ee
-from eeImage import get_images
+from mod.eeImage import get_images
 
 ee.Initialize()
 

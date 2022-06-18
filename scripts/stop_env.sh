@@ -1,5 +1,5 @@
 #/bin/bash
-cd ~/user/lawnproject/docker_clusters 
+cd ~/user/mids-w210-capstone/docker_clusters 
 docker-compose down 
 docker ps -a
-cd -
+cd ~/user/mids-w210-capstone/scripts

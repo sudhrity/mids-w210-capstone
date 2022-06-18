@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<script>
+$(document).ready(function() {
+  $("#add_text").click(function() {
+    $('.ui.modal').modal('show');
+  });
+
+  $("#save").click(function() {
+
+    var textareaContent = $("#symbols").val();
+    var symbols = textareaContent.split("\n");
+
+    for (var i = 0; i < symbols.length; ++i) {
+      console.log(symbols[i]);
+      
+      $.ajax({
+        url: '/predict2',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({"text": [symbols[i]]}),
+        dataType: 'json'
+      });
+    }
+
+    $('.ui.modal').modal('hide');
+  });
+});
+</script>
+
+
+<h2>Filters</h2>
+
+<form method="get">
+
+<div class="ui input">
+  <input name="positive_score" type="text" placeholder="Positive (gt)" value="{{ positive_score or '' }}">
+</div>
+
+<div class="ui input">
+  <input name="negative_score" type="text" placeholder="Negative (lt)" value="{{ negative_score or '' }}">
+</div>
+
+<button type="submit" class="ui button primary">Filter/Refresh</button>
+
+</form>
+
+<button id="add_text" class="ui button secondary">Enter Text</button>
+
+
+<table class="ui celled table">
+  <thead>
+    <tr>
+      <th>Text</th>
+      <th>Positive</th>
+      <th>Negative</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for sentiment in sentiments %}
+    <tr>
+      <td>{{ sentiment.text }}</td>
+      <td>{{ sentiment.positive_score }}</td>
+      <td>{{ sentiment.negative_score }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="ui modal">
+    <i class="close icon"></i>
+    <div class="header">
+      Add Text
+    </div>
+    <div class="content">
+        <div class="ui form">
+            <div class="field">
+              <label>Text</label>
+              <textarea id="symbols"></textarea>
+            </div>
+          </div>
+    </div>
+    <div class="actions">
+      <div id="save" class="ui positive right labeled icon button">
+        Add Text
+        <i class="plus icon"></i>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

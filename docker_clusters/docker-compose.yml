@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+
+  postgres:
+    image: w205_postgres
+    command: postgres -c 'shared_buffers=1GB'
+    shm_size: '1GB'
+    stdin_open: true
+    tty: true
+    environment:
+      POSTGRES_PASSWORD: ucb
+    volumes:
+      - /home/w205/user:/user
+      - /home/w205/docker/mounts/postgres/data:/var/lib/postgresql/data
+    expose:
+      - "5432"
+    ports:
+      - "5432:5432"
+    extra_hosts:
+      - "localhost:127.0.0.1"
+
+  redis:
+    image: w205_redis
+    volumes:
+      - /home/w205/docker/mounts/redis/data:/data
+    expose:
+      - "6379"
+    ports:
+      - "6379:6379"
+
+  nginx:
+    image: w205_nginx:v2
+    volumes:
+      - /home/w205/user:/user
+    expose:
+      - "80"
+      - "443"
+    ports:
+      - "80:80"
+      - "443:443"
+
+  anaconda:
+    image: w205_anaconda
+    stdin_open: true
+    tty: true
+    volumes:
+      - /home/w205/user:/user
+      - /home/w205/docker/mounts/anaconda/environments:/opt/conda/envs
+    expose:
+      - "5000"
+      - "8888"
+    ports:
+      - "5000:5000"
+      - "8888:8888"
+
+

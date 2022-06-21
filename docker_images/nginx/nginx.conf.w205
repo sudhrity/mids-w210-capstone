@@ -44,7 +44,7 @@ http {
 
         location / {
 #           root   /user/labs/week_12/static;
-            root   /user/lawnproject/www/html;
+            root   /user/mids-w210-capstone/www/html;
             index  index.html index.htm;
         }
 

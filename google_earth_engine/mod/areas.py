@@ -53,8 +53,6 @@ async def calc_polygon_area(json_polygon):
 @router2.get("/{zipcode}")
 async def calc_zip_area(zipcode):
 
-    # zipcode = str(zipcode)
-
     areas = get_areas(training_image_classified, zipcode)
 
     return areas

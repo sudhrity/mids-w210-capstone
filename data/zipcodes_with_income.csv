@@ -1,0 +1,501 @@
+,zipcode,state,county,city_neighborhood,year,affluency,median_income
+0,90001,CA,Los Angeles County,Los Angeles,2010,yes,35097
+1,90002,CA,Los Angeles County,Los Angeles,2010,yes,31258
+2,90003,CA,Los Angeles County,Los Angeles,2010,yes,29686
+3,90004,CA,Los Angeles County,Los Angeles,2010,yes,37976
+4,90005,CA,Los Angeles County,Los Angeles,2010,yes,31893
+5,90006,CA,Los Angeles County,Los Angeles,2010,yes,30961
+6,90007,CA,Los Angeles County,Los Angeles,2010,yes,22420
+7,90008,CA,Los Angeles County,Los Angeles,2010,yes,38210
+8,90009,CA,Los Angeles County,Los Angeles,2010,No,
+9,90010,CA,Los Angeles County,Los Angeles,2010,yes,51359
+10,90011,CA,Los Angeles County,Los Angeles,2010,yes,30171
+11,90012,CA,Los Angeles County,Los Angeles,2010,yes,28879
+12,90013,CA,Los Angeles County,Los Angeles,2010,yes,20271
+13,90014,CA,Los Angeles County,Los Angeles,2010,yes,16551
+14,90015,CA,Los Angeles County,Los Angeles,2010,yes,27393
+15,90016,CA,Los Angeles County,Los Angeles,2010,yes,37242
+16,90017,CA,Los Angeles County,Los Angeles,2010,yes,21030
+17,90018,CA,Los Angeles County,Los Angeles,2010,yes,32447
+18,90019,CA,Los Angeles County,Los Angeles,2010,yes,42043
+19,90020,CA,Los Angeles County,Los Angeles,2010,yes,38510
+20,90021,CA,Los Angeles County,Los Angeles,2010,yes,13415
+21,90022,CA,Los Angeles County,Los Angeles,2010,yes,38925
+22,90023,CA,Los Angeles County,Los Angeles,2010,yes,33849
+23,90024,CA,Los Angeles County,Los Angeles,2010,yes,54373
+24,90025,CA,Los Angeles County,Los Angeles,2010,yes,73478
+25,90026,CA,Los Angeles County,Los Angeles,2010,yes,44327
+26,90027,CA,Los Angeles County,Los Angeles,2010,yes,47993
+27,90028,CA,Los Angeles County,Los Angeles,2010,yes,30953
+28,90029,CA,Los Angeles County,Los Angeles,2010,yes,36979
+29,90030,CA,Los Angeles County,Los Angeles,2010,No,
+30,90031,CA,Los Angeles County,Los Angeles,2010,yes,34655
+31,90032,CA,Los Angeles County,Los Angeles,2010,yes,46508
+32,90033,CA,Los Angeles County,Los Angeles,2010,yes,28005
+33,90034,CA,Los Angeles County,Los Angeles,2010,yes,56946
+34,90035,CA,Los Angeles County,Los Angeles,2010,yes,75863
+35,90036,CA,Los Angeles County,Los Angeles,2010,yes,71589
+36,90037,CA,Los Angeles County,Los Angeles,2010,yes,26796
+37,90038,CA,Los Angeles County,Los Angeles,2010,yes,35144
+38,90039,CA,Los Angeles County,Los Angeles,2010,yes,64080
+39,90040,CA,Los Angeles County,Los Angeles,2010,yes,47758
+40,90041,CA,Los Angeles County,Los Angeles,2010,yes,63770
+41,90042,CA,Los Angeles County,Los Angeles,2010,yes,50996
+42,90043,CA,Los Angeles County,Los Angeles,2010,yes,40658
+43,90044,CA,Los Angeles County,Los Angeles,2010,yes,29870
+44,90045,CA,Los Angeles County,Los Angeles,2010,yes,77893
+45,90046,CA,Los Angeles County,Los Angeles,2010,yes,52641
+46,90047,CA,Los Angeles County,Los Angeles,2010,yes,41842
+47,90048,CA,Los Angeles County,Los Angeles,2010,yes,72701
+48,90049,CA,Los Angeles County,Los Angeles,2010,yes,110854
+49,90050,CA,Los Angeles County,Los Angeles,2010,No,
+50,90051,CA,Los Angeles County,Los Angeles,2010,No,
+51,90052,CA,Los Angeles County,Los Angeles,2010,No,
+52,90053,CA,Los Angeles County,Los Angeles,2010,No,
+53,90054,CA,Los Angeles County,Los Angeles,2010,No,
+54,90055,CA,Los Angeles County,Los Angeles,2010,No,
+55,90056,CA,Los Angeles County,Los Angeles,2010,yes,86858
+56,90057,CA,Los Angeles County,Los Angeles,2010,yes,28035
+57,90058,CA,Los Angeles County,Los Angeles,2010,yes,16750
+58,90059,CA,Los Angeles County,Los Angeles,2010,yes,33962
+59,90060,CA,Los Angeles County,Los Angeles,2010,No,
+60,90061,CA,Los Angeles County,Los Angeles,2010,yes,33476
+61,90062,CA,Los Angeles County,Los Angeles,2010,yes,33192
+62,90063,CA,Los Angeles County,Los Angeles,2010,yes,38441
+63,90064,CA,Los Angeles County,Los Angeles,2010,yes,84579
+64,90065,CA,Los Angeles County,Los Angeles,2010,yes,53635
+65,90066,CA,Los Angeles County,Los Angeles,2010,yes,66744
+66,90067,CA,Los Angeles County,Los Angeles,2010,yes,90972
+67,90068,CA,Los Angeles County,Los Angeles,2010,yes,67500
+68,90069,CA,Los Angeles County,West Hollywood,2010,yes,75451
+69,90070,CA,Los Angeles County,Los Angeles,2010,No,
+70,90071,CA,Los Angeles County,Los Angeles,2010,yes,
+71,90072,CA,Los Angeles County,Los Angeles,2010,No,
+72,90073,CA,Los Angeles County,Los Angeles,2010,No,
+73,90074,CA,Los Angeles County,Los Angeles,2010,No,
+74,90075,CA,Los Angeles County,Los Angeles,2010,No,
+75,90076,CA,Los Angeles County,Los Angeles,2010,No,
+76,90077,CA,Los Angeles County,Los Angeles,2010,yes,168036
+77,90078,CA,Los Angeles County,Los Angeles,2010,No,
+78,90079,CA,Los Angeles County,Los Angeles,2010,No,
+79,90080,CA,Los Angeles County,Los Angeles,2010,No,
+80,90081,CA,Los Angeles County,Los Angeles,2010,No,
+81,90082,CA,Los Angeles County,Los Angeles,2010,No,
+82,90083,CA,Los Angeles County,Los Angeles,2010,No,
+83,90084,CA,Los Angeles County,Los Angeles,2010,No,
+84,90086,CA,Los Angeles County,Los Angeles,2010,No,
+85,90087,CA,Los Angeles County,Los Angeles,2010,No,
+86,90088,CA,Los Angeles County,Los Angeles,2010,No,
+87,90089,CA,Los Angeles County,Los Angeles,2010,No,
+88,90090,CA,Los Angeles County,Dodgertown,2010,No,
+89,90091,CA,Los Angeles County,Los Angeles,2010,No,
+90,90093,CA,Los Angeles County,Los Angeles,2010,No,
+91,90094,CA,Los Angeles County,Playa Vista,2010,yes,91042
+92,90095,CA,Los Angeles County,Los Angeles,2010,No,
+93,90096,CA,Los Angeles County,Los Angeles,2010,No,
+94,90097,,,,,No,0
+95,90099,CA,Los Angeles County,Los Angeles,2010,No,
+96,90101,CA,Los Angeles County,Los Angeles,2010,No,
+97,90102,CA,Los Angeles County,Los Angeles,2010,No,
+98,90103,CA,Los Angeles County,Los Angeles,2010,No,
+99,90174,,,,,No,0
+100,90185,,,,,No,0
+101,90189,CA,Los Angeles County,Los Angeles,2010,No,
+102,90201,CA,Los Angeles County,Bell Gardens,2010,yes,37267
+103,90202,CA,Los Angeles County,Bell,2010,No,
+104,90209,CA,Los Angeles County,Beverly Hills,2010,No,
+105,90210,CA,Los Angeles County,Beverly Hills,2010,yes,132254
+106,90211,CA,Los Angeles County,Beverly Hills,2010,yes,68589
+107,90212,CA,Los Angeles County,Beverly Hills,2010,yes,83679
+108,90213,CA,Los Angeles County,Beverly Hills,2010,No,
+109,90220,CA,Los Angeles County,Compton,2010,yes,43592
+110,90221,CA,Los Angeles County,Compton,2010,yes,42853
+111,90222,CA,Los Angeles County,Compton,2010,yes,40707
+112,90223,CA,Los Angeles County,Compton,2010,No,
+113,90224,CA,Los Angeles County,Compton,2010,No,
+114,90230,CA,Los Angeles County,Culver City,2010,yes,71235
+115,90231,CA,Los Angeles County,Culver City,2010,No,
+116,90232,CA,Los Angeles County,Culver City,2010,yes,73103
+117,90233,CA,Los Angeles County,Culver City,2010,No,
+118,90239,CA,Los Angeles County,Downey,2010,No,
+119,90240,CA,Los Angeles County,Downey,2010,yes,72777
+120,90241,CA,Los Angeles County,Downey,2010,yes,56479
+121,90242,CA,Los Angeles County,Downey,2010,yes,58217
+122,90245,CA,Los Angeles County,El Segundo,2010,yes,84341
+123,90247,CA,Los Angeles County,Gardena,2010,yes,44693
+124,90248,CA,Los Angeles County,Gardena,2010,yes,52013
+125,90249,CA,Los Angeles County,Gardena,2010,yes,51871
+126,90250,CA,Los Angeles County,Hawthorne,2010,yes,45995
+127,90251,CA,Los Angeles County,Hawthorne,2010,No,
+128,90254,CA,Los Angeles County,Hermosa Beach,2010,yes,101655
+129,90255,CA,Los Angeles County,Huntington Park,2010,yes,37651
+130,90260,CA,Los Angeles County,Lawndale,2010,yes,51777
+131,90261,CA,Los Angeles County,Lawndale,2010,No,
+132,90262,CA,Los Angeles County,Lynwood,2010,yes,40831
+133,90263,CA,Los Angeles County,Malibu,2010,No,
+134,90264,CA,Los Angeles County,Malibu,2010,No,
+135,90265,CA,Los Angeles County,Malibu,2010,yes,129750
+136,90266,CA,Los Angeles County,Manhattan Beach,2010,yes,139259
+137,90267,CA,Los Angeles County,Manhattan Beach,2010,No,
+138,90270,CA,Los Angeles County,Maywood,2010,yes,37082
+139,90272,CA,Los Angeles County,Pacific Palisades,2010,yes,159696
+140,90274,CA,Los Angeles County,Palos Verdes Peninsula,2010,yes,151469
+141,90275,CA,Los Angeles County,Rancho Palos Verdes,2010,yes,118860
+142,90277,CA,Los Angeles County,Redondo Beach,2010,yes,97158
+143,90278,CA,Los Angeles County,Redondo Beach,2010,yes,101575
+144,90280,CA,Los Angeles County,South Gate,2010,yes,42776
+145,90290,CA,Los Angeles County,Topanga,2010,yes,118750
+146,90291,CA,Los Angeles County,Venice,2010,yes,79736
+147,90292,CA,Los Angeles County,Marina Del Rey,2010,yes,100441
+148,90293,CA,Los Angeles County,Playa Del Rey,2010,yes,87308
+149,90294,CA,Los Angeles County,Venice,2010,No,
+150,90295,CA,Los Angeles County,Marina Del Rey,2010,No,
+151,90296,CA,Los Angeles County,Playa Del Rey,2010,No,
+152,90301,CA,Los Angeles County,Inglewood,2010,yes,38160
+153,90302,CA,Los Angeles County,Inglewood,2010,yes,43042
+154,90303,CA,Los Angeles County,Inglewood,2010,yes,41622
+155,90304,CA,Los Angeles County,Inglewood,2010,yes,37783
+156,90305,CA,Los Angeles County,Inglewood,2010,yes,64735
+157,90306,CA,Los Angeles County,Inglewood,2010,No,
+158,90307,CA,Los Angeles County,Inglewood,2010,No,
+159,90308,CA,Los Angeles County,Inglewood,2010,No,
+160,90309,CA,Los Angeles County,Inglewood,2010,No,
+161,90310,CA,Los Angeles County,Inglewood,2010,No,
+162,90311,CA,Los Angeles County,Inglewood,2010,No,
+163,90312,CA,Los Angeles County,Inglewood,2010,No,
+164,90313,CA,Los Angeles County,Inglewood,2010,No,
+165,90397,CA,Los Angeles County,Inglewood,2010,No,
+166,90398,CA,Los Angeles County,Inglewood,2010,No,
+167,90401,CA,Los Angeles County,Santa Monica,2010,yes,62794
+168,90402,CA,Los Angeles County,Santa Monica,2010,yes,140139
+169,90403,CA,Los Angeles County,Santa Monica,2010,yes,71424
+170,90404,CA,Los Angeles County,Santa Monica,2010,yes,59695
+171,90405,CA,Los Angeles County,Santa Monica,2010,yes,75717
+172,90406,CA,Los Angeles County,Santa Monica,2010,No,
+173,90407,CA,Los Angeles County,Santa Monica,2010,No,
+174,90408,CA,Los Angeles County,Santa Monica,2010,No,
+175,90409,CA,Los Angeles County,Santa Monica,2010,No,
+176,90410,CA,Los Angeles County,Santa Monica,2010,No,
+177,90411,CA,Los Angeles County,Santa Monica,2010,No,
+178,90501,CA,Los Angeles County,Torrance,2010,yes,55138
+179,90502,CA,Los Angeles County,Torrance,2010,yes,63721
+180,90503,CA,Los Angeles County,Torrance,2010,yes,76082
+181,90504,CA,Los Angeles County,Torrance,2010,yes,72194
+182,90505,CA,Los Angeles County,Torrance,2010,yes,81772
+183,90506,CA,Los Angeles County,Torrance,2010,No,
+184,90507,CA,Los Angeles County,Torrance,2010,No,
+185,90508,CA,Los Angeles County,Torrance,2010,No,
+186,90509,CA,Los Angeles County,Torrance,2010,No,
+187,90510,CA,Los Angeles County,Torrance,2010,No,
+188,90601,CA,Los Angeles County,Whittier,2010,yes,69375
+189,90602,CA,Los Angeles County,Whittier,2010,yes,49873
+190,90603,CA,Los Angeles County,Whittier,2010,yes,90477
+191,90604,CA,Los Angeles County,Whittier,2010,yes,65570
+192,90605,CA,Los Angeles County,Whittier,2010,yes,67482
+193,90606,CA,Los Angeles County,Whittier,2010,yes,61800
+194,90607,CA,Los Angeles County,Whittier,2010,No,
+195,90608,CA,Los Angeles County,Whittier,2010,No,
+196,90609,CA,Los Angeles County,Whittier,2010,No,
+197,90610,CA,Los Angeles County,Whittier,2010,No,
+198,90612,CA,Los Angeles County,Whittier,2010,No,
+199,90631,CA,Orange County,La Habra,2010,yes,65804
+200,90637,CA,Los Angeles County,La Mirada,2010,No,
+201,90638,CA,Los Angeles County,La Mirada,2010,yes,81722
+202,90639,CA,Los Angeles County,La Mirada,2010,No,
+203,90640,CA,Los Angeles County,Montebello,2010,yes,47438
+204,90650,CA,Los Angeles County,Norwalk,2010,yes,60770
+205,90651,CA,Los Angeles County,Norwalk,2010,No,
+206,90652,CA,Los Angeles County,Norwalk,2010,No,
+207,90659,CA,Los Angeles County,Norwalk,2010,No,
+208,90660,CA,Los Angeles County,Pico Rivera,2010,yes,57605
+209,90661,CA,Los Angeles County,Pico Rivera,2010,No,
+210,90662,CA,Los Angeles County,Pico Rivera,2010,No,
+211,90665,,,,,No,0
+212,90670,CA,Los Angeles County,Santa Fe Springs,2010,yes,55525
+213,90671,CA,Los Angeles County,Santa Fe Springs,2010,No,
+214,90701,CA,Los Angeles County,Artesia,2010,yes,59946
+215,90702,CA,Los Angeles County,Artesia,2010,No,
+216,90703,CA,Los Angeles County,Cerritos,2010,yes,89113
+217,90704,CA,Los Angeles County,Avalon,2010,yes,65721
+218,90706,CA,Los Angeles County,Bellflower,2010,yes,49637
+219,90707,CA,Los Angeles County,Bellflower,2010,No,
+220,90710,CA,Los Angeles County,Harbor City,2010,yes,54065
+221,90711,CA,Los Angeles County,Lakewood,2010,No,
+222,90712,CA,Los Angeles County,Lakewood,2010,yes,77495
+223,90713,CA,Los Angeles County,Lakewood,2010,yes,85742
+224,90714,CA,Los Angeles County,Lakewood,2010,No,
+225,90715,CA,Los Angeles County,Lakewood,2010,yes,65481
+226,90716,CA,Los Angeles County,Hawaiian Gardens,2010,yes,41910
+227,90717,CA,Los Angeles County,Lomita,2010,yes,58320
+228,90723,CA,Los Angeles County,Paramount,2010,yes,44934
+229,90731,CA,Los Angeles County,San Pedro,2010,yes,50210
+230,90732,CA,Los Angeles County,San Pedro,2010,yes,80172
+231,90733,CA,Los Angeles County,San Pedro,2010,No,
+232,90734,CA,Los Angeles County,San Pedro,2010,No,
+233,90744,CA,Los Angeles County,Wilmington,2010,yes,41920
+234,90745,CA,Los Angeles County,Carson,2010,yes,71854
+235,90746,CA,Los Angeles County,Carson,2010,yes,80092
+236,90747,CA,Los Angeles County,Carson,2010,No,
+237,90748,CA,Los Angeles County,Wilmington,2010,No,
+238,90749,CA,Los Angeles County,Carson,2010,No,
+239,90755,CA,Los Angeles County,Signal Hill,2010,yes,71077
+240,90801,CA,Los Angeles County,Long Beach,2010,No,
+241,90802,CA,Los Angeles County,Long Beach,2010,yes,43404
+242,90803,CA,Los Angeles County,Long Beach,2010,yes,72653
+243,90804,CA,Los Angeles County,Long Beach,2010,yes,42672
+244,90805,CA,Los Angeles County,Long Beach,2010,yes,44070
+245,90806,CA,Los Angeles County,Long Beach,2010,yes,42998
+246,90807,CA,Los Angeles County,Long Beach,2010,yes,71645
+247,90808,CA,Los Angeles County,Long Beach,2010,yes,94335
+248,90809,CA,Los Angeles County,Long Beach,2010,No,
+249,90810,CA,Los Angeles County,Long Beach,2010,yes,49269
+250,90813,CA,Los Angeles County,Long Beach,2010,yes,31334
+251,90814,CA,Los Angeles County,Long Beach,2010,yes,55415
+252,90815,CA,Los Angeles County,Long Beach,2010,yes,82805
+253,90822,CA,Los Angeles County,Long Beach,2010,No,
+254,90831,CA,Los Angeles County,Long Beach,2010,No,
+255,90832,CA,Los Angeles County,Long Beach,2010,No,
+256,90833,CA,Los Angeles County,Long Beach,2010,No,
+257,90834,CA,Los Angeles County,Long Beach,2010,No,
+258,90835,CA,Los Angeles County,Long Beach,2010,No,
+259,90840,CA,Los Angeles County,Long Beach,2010,No,
+260,90842,CA,Los Angeles County,Long Beach,2010,No,
+261,90844,CA,Los Angeles County,Long Beach,2010,No,
+262,90845,CA,Los Angeles County,Long Beach,2010,No,
+263,90846,CA,Los Angeles County,Long Beach,2010,No,
+264,90847,CA,Los Angeles County,Long Beach,2010,No,
+265,90848,CA,Los Angeles County,Long Beach,2010,No,
+266,90853,CA,Los Angeles County,Long Beach,2010,No,
+267,90888,CA,Los Angeles County,Long Beach,2010,No,
+268,90895,CA,Los Angeles County,Carson,2010,No,
+269,90899,CA,Los Angeles County,Long Beach,2010,No,
+270,91001,CA,Los Angeles County,Altadena,2010,yes,85108
+271,91003,CA,Los Angeles County,Altadena,2010,No,
+272,91006,CA,Los Angeles County,Arcadia,2010,yes,80183
+273,91007,CA,Los Angeles County,Arcadia,2010,yes,73615
+274,91008,CA,Los Angeles County,Duarte,2010,yes,85556
+275,91009,CA,Los Angeles County,Duarte,2010,No,
+276,91010,CA,Los Angeles County,Duarte,2010,yes,59198
+277,91011,CA,Los Angeles County,La Canada Flintridge,2010,yes,156557
+278,91012,CA,Los Angeles County,La Canada Flintridge,2010,No,
+279,91016,CA,Los Angeles County,Monrovia,2010,yes,71733
+280,91017,CA,Los Angeles County,Monrovia,2010,No,
+281,91020,CA,Los Angeles County,Montrose,2010,yes,63250
+282,91021,CA,Los Angeles County,Montrose,2010,No,
+283,91023,CA,Los Angeles County,Mount Wilson,2010,No,
+284,91024,CA,Los Angeles County,Sierra Madre,2010,yes,88837
+285,91025,CA,Los Angeles County,Sierra Madre,2010,No,
+286,91030,CA,Los Angeles County,South Pasadena,2010,yes,85058
+287,91031,CA,Los Angeles County,South Pasadena,2010,No,
+288,91040,CA,Los Angeles County,Sunland,2010,yes,69312
+289,91041,CA,Los Angeles County,Sunland,2010,No,
+290,91042,CA,Los Angeles County,Tujunga,2010,yes,57500
+291,91043,CA,Los Angeles County,Tujunga,2010,No,
+292,91046,CA,Los Angeles County,Verdugo City,2010,yes,
+293,91066,CA,Los Angeles County,Arcadia,2010,No,
+294,91077,CA,Los Angeles County,Arcadia,2010,No,
+295,91101,CA,Los Angeles County,Pasadena,2010,yes,56980
+296,91102,CA,Los Angeles County,Pasadena,2010,No,
+297,91103,CA,Los Angeles County,Pasadena,2010,yes,59682
+298,91104,CA,Los Angeles County,Pasadena,2010,yes,67068
+299,91105,CA,Los Angeles County,Pasadena,2010,yes,109922
+300,91106,CA,Los Angeles County,Pasadena,2010,yes,66250
+301,91107,CA,Los Angeles County,Pasadena,2010,yes,80936
+302,91108,CA,Los Angeles County,San Marino,2010,yes,140703
+303,91109,CA,Los Angeles County,Pasadena,2010,No,
+304,91110,CA,Los Angeles County,Pasadena,2010,No,
+305,91114,CA,Los Angeles County,Pasadena,2010,No,
+306,91115,CA,Los Angeles County,Pasadena,2010,No,
+307,91116,CA,Los Angeles County,Pasadena,2010,No,
+308,91117,CA,Los Angeles County,Pasadena,2010,No,
+309,91118,CA,Los Angeles County,San Marino,2010,No,
+310,91121,CA,Los Angeles County,Pasadena,2010,No,
+311,91123,CA,Los Angeles County,Pasadena,2010,No,
+312,91124,CA,Los Angeles County,Pasadena,2010,No,
+313,91125,CA,Los Angeles County,Pasadena,2010,No,
+314,91126,CA,Los Angeles County,Pasadena,2010,No,
+315,91129,CA,Los Angeles County,Pasadena,2010,No,
+316,91131,CA,Los Angeles County,Pasadena,2010,No,
+317,91175,,,,,No,0
+318,91182,CA,Los Angeles County,Pasadena,2010,No,
+319,91184,CA,Los Angeles County,Pasadena,2010,No,
+320,91185,CA,Los Angeles County,Pasadena,2010,No,
+321,91186,,,,,No,0
+322,91187,,,,,No,0
+323,91188,CA,Los Angeles County,Pasadena,2010,No,
+324,91189,CA,Los Angeles County,Pasadena,2010,No,
+325,91191,CA,Los Angeles County,Pasadena,2010,No,
+326,91201,CA,Los Angeles County,Glendale,2010,yes,50107
+327,91202,CA,Los Angeles County,Glendale,2010,yes,66067
+328,91203,CA,Los Angeles County,Glendale,2010,yes,43078
+329,91204,CA,Los Angeles County,Glendale,2010,yes,37634
+330,91205,CA,Los Angeles County,Glendale,2010,yes,36906
+331,91206,CA,Los Angeles County,Glendale,2010,yes,52570
+332,91207,CA,Los Angeles County,Glendale,2010,yes,91005
+333,91208,CA,Los Angeles County,Glendale,2010,yes,92532
+334,91209,CA,Los Angeles County,Glendale,2010,No,
+335,91210,CA,Los Angeles County,Glendale,2010,yes,
+336,91214,CA,Los Angeles County,La Crescenta,2010,yes,90414
+337,91221,CA,Los Angeles County,Glendale,2010,No,
+338,91222,CA,Los Angeles County,Glendale,2010,No,
+339,91224,CA,Los Angeles County,La Crescenta,2010,No,
+340,91225,CA,Los Angeles County,Glendale,2010,No,
+341,91226,CA,Los Angeles County,Glendale,2010,No,
+342,91301,CA,Los Angeles County,Agoura Hills,2010,yes,109675
+343,91302,CA,Los Angeles County,Calabasas,2010,yes,129708
+344,91303,CA,Los Angeles County,Canoga Park,2010,yes,47484
+345,91304,CA,Los Angeles County,Canoga Park,2010,yes,58889
+346,91305,CA,Los Angeles County,Canoga Park,2010,No,
+347,91306,CA,Los Angeles County,Winnetka,2010,yes,61112
+348,91307,CA,Los Angeles County,West Hills,2010,yes,97081
+349,91308,CA,Los Angeles County,West Hills,2010,No,
+350,91309,CA,Los Angeles County,Canoga Park,2010,No,
+351,91310,CA,Los Angeles County,Castaic,2010,No,
+352,91311,CA,Los Angeles County,Chatsworth,2010,yes,78414
+353,91312,,,,,No,0
+354,91313,CA,Los Angeles County,Chatsworth,2010,No,
+355,91316,CA,Los Angeles County,Encino,2010,yes,59199
+356,91321,CA,Los Angeles County,Newhall,2010,yes,56079
+357,91322,CA,Los Angeles County,Newhall,2010,No,
+358,91324,CA,Los Angeles County,Northridge,2010,yes,58663
+359,91325,CA,Los Angeles County,Northridge,2010,yes,59646
+360,91326,CA,Los Angeles County,Porter Ranch,2010,yes,99230
+361,91327,CA,Los Angeles County,Northridge,2010,No,
+362,91328,CA,Los Angeles County,Northridge,2010,No,
+363,91329,CA,Los Angeles County,Northridge,2010,No,
+364,91330,CA,Los Angeles County,Northridge,2010,No,
+365,91331,CA,Los Angeles County,Pacoima,2010,yes,51477
+366,91333,CA,Los Angeles County,Pacoima,2010,No,
+367,91334,CA,Los Angeles County,Pacoima,2010,No,
+368,91335,CA,Los Angeles County,Reseda,2010,yes,51266
+369,91337,CA,Los Angeles County,Reseda,2010,No,
+370,91340,CA,Los Angeles County,San Fernando,2010,yes,54440
+371,91341,CA,Los Angeles County,San Fernando,2010,No,
+372,91342,CA,Los Angeles County,Sylmar,2010,yes,59329
+373,91343,CA,Los Angeles County,North Hills,2010,yes,54166
+374,91344,CA,Los Angeles County,Granada Hills,2010,yes,77604
+375,91345,CA,Los Angeles County,Mission Hills,2010,yes,60352
+376,91346,CA,Los Angeles County,Mission Hills,2010,No,
+377,91350,CA,Los Angeles County,Santa Clarita,2010,yes,98112
+378,91351,CA,Los Angeles County,Canyon Country,2010,yes,71153
+379,91352,CA,Los Angeles County,Sun Valley,2010,yes,48844
+380,91353,CA,Los Angeles County,Sun Valley,2010,No,
+381,91354,CA,Los Angeles County,Valencia,2010,yes,107654
+382,91355,CA,Los Angeles County,Valencia,2010,yes,88415
+383,91356,CA,Los Angeles County,Tarzana,2010,yes,70759
+384,91357,CA,Los Angeles County,Tarzana,2010,No,
+385,91361,CA,Ventura County,Westlake Village,2010,yes,101146
+386,91364,CA,Los Angeles County,Woodland Hills,2010,yes,91100
+387,91365,CA,Los Angeles County,Woodland Hills,2010,No,
+388,91367,CA,Los Angeles County,Woodland Hills,2010,yes,76548
+389,91371,CA,Los Angeles County,Woodland Hills,2010,No,
+390,91372,CA,Los Angeles County,Calabasas,2010,No,
+391,91376,CA,Los Angeles County,Agoura Hills,2010,No,
+392,91380,CA,Los Angeles County,Santa Clarita,2010,No,
+393,91381,CA,Los Angeles County,Stevenson Ranch,2010,yes,116420
+394,91382,CA,Los Angeles County,Santa Clarita,2010,No,
+395,91383,CA,Los Angeles County,Santa Clarita,2010,No,
+396,91384,CA,Los Angeles County,Castaic,2010,yes,100404
+397,91385,CA,Los Angeles County,Valencia,2010,No,
+398,91386,CA,Los Angeles County,Canyon Country,2010,No,
+399,91387,CA,Los Angeles County,Canyon Country,2010,yes,83484
+400,91388,CA,Los Angeles County,Van Nuys,2010,No,
+401,91390,CA,Los Angeles County,Santa Clarita,2010,yes,106190
+402,91392,CA,Los Angeles County,Sylmar,2010,No,
+403,91393,CA,Los Angeles County,North Hills,2010,No,
+404,91394,CA,Los Angeles County,Granada Hills,2010,No,
+405,91395,CA,Los Angeles County,Mission Hills,2010,No,
+406,91396,CA,Los Angeles County,Winnetka,2010,No,
+407,91399,CA,Los Angeles County,Woodland Hills,2010,No,
+408,91401,CA,Los Angeles County,Van Nuys,2010,yes,46420
+409,91402,CA,Los Angeles County,Panorama City,2010,yes,40186
+410,91403,CA,Los Angeles County,Sherman Oaks,2010,yes,69956
+411,91405,CA,Los Angeles County,Van Nuys,2010,yes,38847
+412,91406,CA,Los Angeles County,Van Nuys,2010,yes,49231
+413,91411,CA,Los Angeles County,Van Nuys,2010,yes,44570
+414,91423,CA,Los Angeles County,Sherman Oaks,2010,yes,74011
+415,91436,CA,Los Angeles County,Encino,2010,yes,132520
+416,91501,CA,Los Angeles County,Burbank,2010,yes,56740
+417,91502,CA,Los Angeles County,Burbank,2010,yes,40714
+418,91504,CA,Los Angeles County,Burbank,2010,yes,73151
+419,91505,CA,Los Angeles County,Burbank,2010,yes,77378
+420,91506,CA,Los Angeles County,Burbank,2010,yes,71914
+421,91601,CA,Los Angeles County,North Hollywood,2010,yes,48638
+422,91602,CA,Los Angeles County,North Hollywood,2010,yes,66652
+423,91604,CA,Los Angeles County,Studio City,2010,yes,88579
+424,91605,CA,Los Angeles County,North Hollywood,2010,yes,43301
+425,91606,CA,Los Angeles County,North Hollywood,2010,yes,42521
+426,91607,CA,Los Angeles County,Valley Village,2010,yes,56635
+427,91608,CA,Los Angeles County,Universal City,2010,No,
+428,91702,CA,Los Angeles County,Azusa,2010,yes,55495
+429,91706,CA,Los Angeles County,Baldwin Park,2010,yes,51232
+430,91711,CA,Los Angeles County,Claremont,2010,yes,88240
+431,91722,CA,Los Angeles County,Covina,2010,yes,66268
+432,91723,CA,Los Angeles County,Covina,2010,yes,61348
+433,91724,CA,Los Angeles County,Covina,2010,yes,77198
+434,91731,CA,Los Angeles County,El Monte,2010,yes,36614
+435,91732,CA,Los Angeles County,El Monte,2010,yes,42465
+436,91733,CA,Los Angeles County,South El Monte,2010,yes,40692
+437,91740,CA,Los Angeles County,Glendora,2010,yes,66880
+438,91741,CA,Los Angeles County,Glendora,2010,yes,82550
+439,91744,CA,Los Angeles County,La Puente,2010,yes,57291
+440,91745,CA,Los Angeles County,Hacienda Heights,2010,yes,76663
+441,91746,CA,Los Angeles County,La Puente,2010,yes,59016
+442,91748,CA,Los Angeles County,Rowland Heights,2010,yes,62517
+443,91749,CA,Los Angeles County,La Puente,2010,No,
+444,91750,CA,Los Angeles County,La Verne,2010,yes,79140
+445,91754,CA,Los Angeles County,Monterey Park,2010,yes,57630
+446,91755,CA,Los Angeles County,Monterey Park,2010,yes,54569
+447,91756,CA,Los Angeles County,Monterey Park,2010,No,
+448,91759,CA,San Bernardino County,Mt Baldy,2010,yes,61094
+449,91765,CA,Los Angeles County,Diamond Bar,2010,yes,88819
+450,91766,CA,Los Angeles County,Pomona,2010,yes,49725
+451,91767,CA,Los Angeles County,Pomona,2010,yes,49881
+452,91768,CA,Los Angeles County,Pomona,2010,yes,47228
+453,91769,CA,Los Angeles County,Pomona,2010,No,
+454,91770,CA,Los Angeles County,Rosemead,2010,yes,47373
+455,91771,CA,Los Angeles County,Rosemead,2010,No,
+456,91772,CA,Los Angeles County,Rosemead,2010,No,
+457,91773,CA,Los Angeles County,San Dimas,2010,yes,78509
+458,91775,CA,Los Angeles County,San Gabriel,2010,yes,81613
+459,91776,CA,Los Angeles County,San Gabriel,2010,yes,47368
+460,91778,CA,Los Angeles County,San Gabriel,2010,No,
+461,91780,CA,Los Angeles County,Temple City,2010,yes,66158
+462,91788,CA,Los Angeles County,Walnut,2010,No,
+463,91789,CA,Los Angeles County,Walnut,2010,yes,91623
+464,91790,CA,Los Angeles County,West Covina,2010,yes,66402
+465,91791,CA,Los Angeles County,West Covina,2010,yes,70111
+466,91792,CA,Los Angeles County,West Covina,2010,yes,66718
+467,91793,CA,Los Angeles County,West Covina,2010,No,
+468,91795,CA,Los Angeles County,Walnut,2010,No,
+469,91797,CA,Los Angeles County,Pomona,2010,No,
+470,91799,CA,Los Angeles County,Pomona,2010,No,
+471,91801,CA,Los Angeles County,Alhambra,2010,yes,53027
+472,91802,CA,Los Angeles County,Alhambra,2010,No,
+473,91803,CA,Los Angeles County,Alhambra,2010,yes,55659
+474,91804,CA,Los Angeles County,Alhambra,2010,No,
+475,91841,CA,Los Angeles County,Alhambra,2010,No,
+476,91896,CA,Los Angeles County,Alhambra,2010,No,
+477,91899,CA,Los Angeles County,Alhambra,2010,No,
+478,92248,CA,Riverside County,La Quinta,2010,No,
+479,92397,CA,San Bernardino County,Wrightwood,2010,No,65469
+480,92821,CA,Orange County,Brea,2010,No,78077
+481,93243,CA,Kern County,Lebec,2010,No,64611
+482,93510,CA,Los Angeles County,Acton,2010,yes,85096
+483,93532,CA,Los Angeles County,Lake Hughes,2010,yes,62688
+484,93534,CA,Los Angeles County,Lancaster,2010,yes,35892
+485,93535,CA,Los Angeles County,Lancaster,2010,yes,44399
+486,93536,CA,Los Angeles County,Lancaster,2010,yes,70577
+487,93539,CA,Los Angeles County,Lancaster,2010,No,
+488,93543,CA,Los Angeles County,Littlerock,2010,yes,56279
+489,93544,CA,Los Angeles County,Llano,2010,yes,51750
+490,93550,CA,Los Angeles County,Palmdale,2010,yes,38316
+491,93551,CA,Los Angeles County,Palmdale,2010,yes,80663
+492,93552,CA,Los Angeles County,Palmdale,2010,yes,56163
+493,93553,CA,Los Angeles County,Pearblossom,2010,yes,50132
+494,93563,CA,Los Angeles County,Valyermo,2010,yes,85250
+495,93584,CA,Los Angeles County,Lancaster,2010,No,
+496,93586,CA,Los Angeles County,Lancaster,2010,No,
+497,93590,CA,Los Angeles County,Palmdale,2010,No,
+498,93591,CA,Los Angeles County,Palmdale,2010,yes,41972
+499,93599,CA,Los Angeles County,Palmdale,2010,No,

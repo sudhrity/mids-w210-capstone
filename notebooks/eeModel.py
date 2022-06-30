@@ -8,36 +8,53 @@ la_county = counties.filter(ee.Filter.eq('NAME', 'Los Angeles'))
 
 PROJECT_DIR = 'projects/california-lawn-detection/assets/'
 
-water = ee.FeatureCollection(f"{PROJECT_DIR}water_torrance_0610")
-vegetation_trees = ee.FeatureCollection(f"{PROJECT_DIR}trees_torrance")
-vegetation_grass = ee.FeatureCollection(f"{PROJECT_DIR}grass_torrance").limit(400)
-turf_1 = ee.FeatureCollection(f"{PROJECT_DIR}turf_torrance1")
-turf_2 = ee.FeatureCollection(f"{PROJECT_DIR}turf_torrance2")
-pv = ee.FeatureCollection(f"{PROJECT_DIR}pv_torrance")
-impervious_1 = ee.FeatureCollection(f"{PROJECT_DIR}impervious_torrance1").limit(40)
-impervious_2 = ee.FeatureCollection(f"{PROJECT_DIR}impervious_torrance2").limit(40)
-soil = ee.FeatureCollection(f"{PROJECT_DIR}soil_torrance").limit(40)
+water_training = ee.FeatureCollection("projects/california-lawn-detection/assets/water_training")
+trees_training = ee.FeatureCollection("projects/california-lawn-detection/assets/trees_training")
+grass_training = ee.FeatureCollection("projects/california-lawn-detection/assets/grass_training")
+turf_training = ee.FeatureCollection("projects/california-lawn-detection/assets/turf_training")
+pv_training = ee.FeatureCollection("projects/california-lawn-detection/assets/pv_training")
+impervious_training = ee.FeatureCollection("projects/california-lawn-detection/assets/impervious_training").limit(50)
+soil_training = ee.FeatureCollection("projects/california-lawn-detection/assets/soil_training").limit(50)
 
-turf = turf_1.merge(turf_2)
-impervious= impervious_1.merge(impervious_2)
+LABELED_SET = water_training.merge(trees_training)\
+                            .merge(grass_training)\
+                            .merge(turf_training)\
+                            .merge(impervious_training)\
+                            .merge(soil_training)
 
-LABELED_SET = water.merge(vegetation_trees)\
-                   .merge(vegetation_grass)\
-                   .merge(turf)\
-                   .merge(impervious)\
-                   .merge(soil)
-    
+
+water_test = ee.FeatureCollection("projects/california-lawn-detection/assets/water_test")
+vegetation_trees_test = ee.FeatureCollection("projects/california-lawn-detection/assets/trees_test")
+vegetation_grass_test  = ee.FeatureCollection("projects/california-lawn-detection/assets/grass_test")
+turf_test  = ee.FeatureCollection("projects/california-lawn-detection/assets/turf_test")
+#pv_test  = ee.FeatureCollection("projects/california-lawn-detection/assets/pv_test")
+impervious_test  = ee.FeatureCollection("projects/california-lawn-detection/assets/impervious_test")
+soil_test  = ee.FeatureCollection("projects/california-lawn-detection/assets/soil_test")
+
+TEST_SET = water_test.merge(vegetation_trees_test)\
+                     .merge(vegetation_grass_test)\
+                     .merge(turf_test)\
+                     .merge(impervious_test)\
+                     .merge(soil_test)
+
+
 training_image_params = {
         'source_image_collection' : 'USDA/NAIP/DOQQ',
-        'years' : [2020]
+        'years' : [2020],
+        'counties': {'lacounty': la_county}
          }
 
 TRAINING_IMAGE = get_images(training_image_params)['2020_la_county']
 
 
+
 # Overlay the points on the imagery to get training.
 LABEL = 'landcover'
-BANDS = ['R', 'G', 'B', 'N', 'NDVI',
+BANDS = ['R',
+         'G',
+         'B',
+         'N',
+         'NDVI',
          'R_Entropy',
          'R_Contrast',
          'R_Gearys',
@@ -48,73 +65,26 @@ BANDS = ['R', 'G', 'B', 'N', 'NDVI',
          'B_Contrast',
          'B_Gearys',
          'N_Entropy',
-         'N_Contrast', 
+         'N_Contrast',
          'N_Gearys']
 
-training_set = TRAINING_IMAGE.select(BANDS).sampleRegions(**{
+train_data = TRAINING_IMAGE.select(BANDS).sampleRegions(**{
   'collection': LABELED_SET,
   'properties': [LABEL],
   'scale': 1
 })
 
-
-def training_area(image, training_class):
-    
-    area = image.reduceRegion(
-           reducer = ee.Reducer.count(), 
-           geometry = training_class.geometry(), 
-           scale = 2, 
-           maxPixels = 1e13
-                )
-
-    return(area.getInfo().get('B'))
+test_data = TRAINING_IMAGE.select(BANDS).sampleRegions(**{
+  'collection': TEST_SET,
+  'properties': [LABEL],
+  'scale': 1
+})
 
 
-def training_polygons(training_class):
-    return(training_class.aggregate_count('label').getInfo())
+clf = ee.Classifier.smileRandomForest(numberOfTrees = 200, minLeafPopulation = 5, bagFraction= 0.7)\
+                   .train(train_data, LABEL, BANDS)
 
 
-# training information
-training_classes = [water,
-                         vegetation_trees,
-                         vegetation_grass,
-                         turf,
-                         pv,
-                         impervious,
-                         soil]
 
-class_names = ['water',
-                         'vegetation_trees',
-                         'vegetation_grass',
-                         'turf',
-                         'pv',
-                         'impervious',
-                         'soil']
-def polygon_areas():
-    try:
-        for i in range(len(training_classes)):
-            area_i = training_area(TRAINING_IMAGE, training_classes[i])
-            polygons_i = training_polygons(training_classes[i])
-            print(class_names[i],"pixels:", area_i ,", polygons", polygons_i)
-    except:
-        print('ERROR. POSSIBLE MISMATCH IN CLASSES LIST AND NAMES LIST SIZES')
-    
-    return
-
-
-#Split Training and Test Set Randomly - there might be a better way to do this
-
-sample = training_set.randomColumn()
-trainingSample = sample.filter('random <= 0.8')
-validationSample = sample.filter('random > 0.8')
-
-def sample_sizes():
-    print("Labeled Set Size in Pixels", training_set.aggregate_count('R').getInfo())
-    print("Training Set Size in Pixels", trainingSample.aggregate_count('R').getInfo())
-    print("Test Set Size in Pixels", validationSample.aggregate_count('R').getInfo())
-    return
-
-clf = ee.Classifier.smileRandomForest(numberOfTrees = 100).train(trainingSample, LABEL, BANDS)
-
-training_image_classified = TRAINING_IMAGE.select(BANDS).classify(clf)
-
+training_image_classified = TRAINING_IMAGE.select(BANDS)\
+                                          .classify(clf)

@@ -55,6 +55,7 @@ def get_areas(imagery, polygon):
 
     total_area = water_area + vegetation_trees_area + vegetation_grass_area + turf_area + impervious_area + soil_area
     dictionary['polygon_area'] = total_area
+
     end = time()
 
     dictionary['inference_time'] = end-start

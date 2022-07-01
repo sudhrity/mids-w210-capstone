@@ -41,7 +41,7 @@ TEST_SET = water_test.merge(vegetation_trees_test)\
 training_image_params = {
         'source_image_collection' : 'USDA/NAIP/DOQQ',
         'years' : [2020],
-        'counties': {'lacounty': la_county}
+        'counties': {'la_county': la_county}
          }
 
 TRAINING_IMAGE = get_images(training_image_params)['2020_la_county']

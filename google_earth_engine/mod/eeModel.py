@@ -12,7 +12,7 @@ water_training = ee.FeatureCollection("projects/california-lawn-detection/assets
 trees_training = ee.FeatureCollection("projects/california-lawn-detection/assets/trees_training")
 grass_training = ee.FeatureCollection("projects/california-lawn-detection/assets/grass_training")
 turf_training = ee.FeatureCollection("projects/california-lawn-detection/assets/turf_training")
-pv_training = ee.FeatureCollection("projects/california-lawn-detection/assets/pv_training")
+# pv_training = ee.FeatureCollection("projects/california-lawn-detection/assets/pv_training")
 impervious_training = ee.FeatureCollection("projects/california-lawn-detection/assets/impervious_training").limit(50)
 soil_training = ee.FeatureCollection("projects/california-lawn-detection/assets/soil_training").limit(50)
 

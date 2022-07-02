@@ -35,27 +35,26 @@ def get_areas(imagery, polygon):
     dictionary = {}
 
     start = time()
-    water_area = area_calculation(imagery, 0, polygon, 20)
+    water_area = area_calculation(imagery, 1, polygon, 20)
     dictionary['water_area'] = water_area
 
-    vegetation_trees_area = area_calculation(imagery, 1, polygon, 20)
+    vegetation_trees_area = area_calculation(imagery, 2, polygon, 20)
     dictionary['tree_area'] = vegetation_trees_area
 
-    vegetation_grass_area = area_calculation(imagery, 2, polygon, 20)
+    vegetation_grass_area = area_calculation(imagery, 3, polygon, 20)
     dictionary['grass_area'] = vegetation_grass_area
 
-    turf_area = area_calculation(imagery, 3, polygon, 20)
+    turf_area = area_calculation(imagery, 4, polygon, 20)
     dictionary['turf_area'] = turf_area
 
-    impervious_area = area_calculation(imagery, 4, polygon, 20)
+    impervious_area = area_calculation(imagery, 6, polygon, 20)
     dictionary['impervious_area'] = impervious_area
 
-    soil_area = area_calculation(imagery, 5, polygon, 20)
+    soil_area = area_calculation(imagery, 7, polygon, 20)
     dictionary['soil_area'] = soil_area
 
     total_area = water_area + vegetation_trees_area + vegetation_grass_area + turf_area + impervious_area + soil_area
     dictionary['polygon_area'] = total_area
-
     end = time()
 
     dictionary['inference_time'] = end-start

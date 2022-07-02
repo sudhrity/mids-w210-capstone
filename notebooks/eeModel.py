@@ -1,5 +1,5 @@
 import ee
-from mod.eeImage import get_images
+from eeImage import get_images
 
 ee.Initialize()
 
@@ -12,7 +12,7 @@ water_training = ee.FeatureCollection("projects/california-lawn-detection/assets
 trees_training = ee.FeatureCollection("projects/california-lawn-detection/assets/trees_training")
 grass_training = ee.FeatureCollection("projects/california-lawn-detection/assets/grass_training")
 turf_training = ee.FeatureCollection("projects/california-lawn-detection/assets/turf_training")
-# pv_training = ee.FeatureCollection("projects/california-lawn-detection/assets/pv_training")
+pv_training = ee.FeatureCollection("projects/california-lawn-detection/assets/pv_training")
 impervious_training = ee.FeatureCollection("projects/california-lawn-detection/assets/impervious_training").limit(50)
 soil_training = ee.FeatureCollection("projects/california-lawn-detection/assets/soil_training").limit(50)
 
@@ -41,7 +41,7 @@ TEST_SET = water_test.merge(vegetation_trees_test)\
 training_image_params = {
         'source_image_collection' : 'USDA/NAIP/DOQQ',
         'years' : [2020],
-        'counties': {'la_county': la_county}
+        'counties': {'lacounty': la_county}
          }
 
 TRAINING_IMAGE = get_images(training_image_params)['2020_la_county']

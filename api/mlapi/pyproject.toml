@@ -23,6 +23,8 @@ sklearn = "^0.0"
 SQLAlchemy = "^1.4.35"
 yfinance = "^0.1.70"
 Jinja2 = "^3.1.1"
+ee="^0.2"
+ee-extra="^0.0.13"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0"

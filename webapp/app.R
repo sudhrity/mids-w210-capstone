@@ -15,10 +15,12 @@ library(shinyWidgets)
 library(tidyr)
 library(dplyr)
 library(ggborderline)
+library(sandwich)
+library(lmtest)
 source("about.R")
 
 con <- dbConnect(odbc(),
-                 Driver='DataDirect 8.0 PostgreSQL Wire Protocol',
+                 Driver='Devart ODBC Driver for PostgreSQL',
                  # ^ use on local Windows development environment
                  # Driver='PostgreSQL',
                  # ^ Use on shinyapps.io deployment
@@ -33,6 +35,9 @@ features <- c('polygon_area','water_area','lawn_area','tree_area','pv_area',
               'impervious_area','soil_area','turf_area','tree_ndvi_mean',
               'tree_ndvi_max','tree_ndvi_min','grass_ndvi_mean','grass_ndvi_max',
               'grass_ndvi_min')
+
+climateFeature <- c("lst_day_mean","lst_day_max","lst_day_min","lst_night_mean", 
+                    "lst_night_max","lst_night_min")
 
 # options(shiny.reactlog = TRUE)
 
@@ -56,49 +61,11 @@ ui <- dashboardPage(
   dashboardHeader(title = "CityAnalytics"),
   
   dashboardSidebar(width = 300,
-                   collapsed = TRUE,
+                   collapsed = TRUE
                    
-                   hr(),
-                   
-                   HTML('<h4>&nbsp&nbspStep One, Define Polygon: </h4>'),
-                   
-                   selectInput('polygon',h5("Draw freehand polygon or select a preloaded polygon: "),
-                               choices = list("Draw polygon on map" = 1, 
-                                              "Predefined polygon" = 2),
-                               selected = 2),
-                   
-                   pickerInput(
-                     inputId = "polygonType",
-                     label = h5("Select type of polygon: "),
-                     choices = c(),
-                     multiple = FALSE,
-                     width = "100%"
-                   ),
-                   
-                   pickerInput(
-                     inputId = "specifyPolygon",
-                     label = h5("Select pre loaded polygon: "),
-                     choices = c(),
-                     multiple = TRUE,
-                     options = list(
-                       `actions-box` = TRUE
-                     ),
-                     width = "100%"
-                   ),
-                   
-                   hr(),
-                   
-                   HTML('<h4>&nbsp&nbspStep Two, Run the Model: </h4>'),
-                   
-                   div(style="display:inline-block;width:1%;text-align: center;",
-                       actionButton("button", "Run the model", icon = icon('fa-brain')))
                    
   ),
   dashboardBody(
-    
-    tags$head(tags$style(
-      HTML('.wrapper {height: auto !important; position:relative; overflow-x:hidden; overflow-y:hidden}')
-    )),
     
     shinyDashboardThemes(
       theme = "grey_light"
@@ -113,6 +80,14 @@ ui <- dashboardPage(
       
     ),
     
+    # tags$head(tags$style(HTML('
+    #                             /* body */
+    #                             .content-wrapper, .right-side {
+    #                             background-color: #FFFFFF;
+    #                             }
+    #                             
+    #                             '))),
+    
     tags$style(".small-box.bg-navy { background-color: #1dd12d !important; color: #000000 !important; }"),
     tags$style(".small-box.bg-teal { background-color: #086f69 !important; color: #000000 !important; }"),
     tags$style(".small-box.bg-olive { background-color: #7c807c !important; color: #000000 !important; }"),
@@ -121,172 +96,287 @@ ui <- dashboardPage(
     tags$style(".small-box.bg-purple { background-color: #A47041 !important; color: #000000 !important; }"),
     tags$style(".small-box.bg-fuchsia { background-color: #0b9ed5 !important; color: #000000 !important; }"),
     
+    tags$head(tags$style(
+      HTML('.wrapper {height: auto !important; position:relative; overflow-x:hidden; overflow-y:hidden}')
+    )),
+    
     tabsetPanel(
       
       tabPanel("About this Tool",
                
-               HTML({
+               fluidRow(
                  
-                 AboutPage
+                 HTML({
+                   
+                   AboutPage
+                   
+                 })
                  
-               })
+               ),
                
       ),
       
       tabPanel("Custom Polygon Prediction", 
                
-               box(width = 2,
-                   
-                   valueBoxOutput("info_box1b", width = 12),
-                   hr(),
-                   valueBoxOutput("info_box2b", width = 12),
-                   hr(),
-                   valueBoxOutput("info_box3b", width = 12),
-                   hr(),
-                   valueBoxOutput("info_box4b", width = 12),
-                   hr(),
-                   valueBoxOutput("info_box5b", width = 12),
-                   hr(),
-                   valueBoxOutput("info_box6b", width = 12),
-                   hr(),
-                   valueBoxOutput("info_box7b", width = 12),
-                   
+               fluidRow(
+                 
+                 box(width = 2,
+                     
+                     valueBoxOutput("info_box1b", width = 12),
+                     hr(),
+                     valueBoxOutput("info_box2b", width = 12),
+                     hr(),
+                     valueBoxOutput("info_box3b", width = 12),
+                     hr(),
+                     valueBoxOutput("info_box4b", width = 12),
+                     hr(),
+                     valueBoxOutput("info_box5b", width = 12),
+                     hr(),
+                     valueBoxOutput("info_box6b", width = 12),
+                     hr(),
+                     valueBoxOutput("info_box7b", width = 12),
+                     
+                 ),
+                 
+                 box(width = 2,
+                     
+                     valueBoxOutput("info_box2a", width = 12),
+                     
+                     box(width = 12,
+                         
+                         div(style="height: 78px;",
+                             sliderInput("slider1a", h6("Change lawn area"),
+                                         min = -100, max = 100, value = 0,
+                                         step = 1)),
+                     ),
+                     
+                     box(width = 12,
+                         
+                         div(style="height: 78px;",
+                             sliderInput("slider2a", h6("Change tree area"),
+                                         min = -100, max = 100, value = 0,
+                                         step = 1)),
+                     ),
+                     
+                     box(width = 12,
+                         
+                         div(style="height: 78px;",
+                             sliderInput("slider3a", h6("Change impervious area"),
+                                         min = -100, max = 100, value = 0,
+                                         step = 1)),
+                     ),
+                     
+                     box(width = 12,
+                         
+                         div(style="height: 78px;",
+                             sliderInput("slider4a", h6("Change water area"),
+                                         min = -100, max = 100, value = 0,
+                                         step = 1)),
+                         
+                     ),
+                     
+                     box(width = 12,
+                         
+                         div(style="height: 78px;",
+                             sliderInput("slider5a", h6("Change soil area"),
+                                         min = -100, max = 100, value = 0,
+                                         step = 1)),
+                     ),
+                     
+                     box(width = 12,
+                         
+                         div(style="height: 78px;",
+                             sliderInput("slider6a", h6("Change turf area"),
+                                         min = -100, max = 100, value = 0,
+                                         step = 1)),
+                         
+                         
+                     ),
+                     
+                 ),
+                 
+                 box(width = 8,
+                     
+                     box(width = 8,
+                         textInput("address", label = "Please type in a reference address: "),
+                         value = '900 Wilshire Blvd, Los Angeles, CA 90017, United States'),
+                     
+                     box(width = 4,
+                         actionButton("submitAddress", label = "Submit Address")),
+                     
+                     box(width = 6,
+                         google_mapOutput(outputId = "myMap", height = 620)
+                     ),
+                     
+                     box(width = 6,
+                         plotlyOutput(outputId = "inferencePlot", height = 620)
+                     )
+                     
+                     
+                 )
+                 
                ),
-               
-               box(width = 2,
-                   
-                   valueBoxOutput("info_box2a", width = 12),
-                   
-                   box(width = 12,
-                       
-                       div(style="height: 78px;",
-                           sliderInput("slider1a", h6("Change lawn area"),
-                                       min = -100, max = 100, value = 0,
-                                       step = 1)),
-                   ),
-                   
-                   box(width = 12,
-                       
-                       div(style="height: 78px;",
-                           sliderInput("slider2a", h6("Change tree area"),
-                                       min = -100, max = 100, value = 0,
-                                       step = 1)),
-                   ),
-                   
-                   box(width = 12,
-                       
-                       div(style="height: 78px;",
-                           sliderInput("slider3a", h6("Change impervious area"),
-                                       min = -100, max = 100, value = 0,
-                                       step = 1)),
-                   ),
-                   
-                   box(width = 12,
-                       
-                       div(style="height: 78px;",
-                           sliderInput("slider4a", h6("Change water area"),
-                                       min = -100, max = 100, value = 0,
-                                       step = 1)),
-                       
-                   ),
-                   
-                   box(width = 12,
-                       
-                       div(style="height: 78px;",
-                           sliderInput("slider5a", h6("Change soil area"),
-                                       min = -100, max = 100, value = 0,
-                                       step = 1)),
-                   ),
-                   
-                   box(width = 12,
-                       
-                       div(style="height: 78px;",
-                           sliderInput("slider6a", h6("Change turf area"),
-                                       min = -100, max = 100, value = 0,
-                                       step = 1)),
-                       
-                       
-                   ),
-                   
-               ),
-               
-               box(width = 8,
-                   
-                   box(width = 8,
-                       textInput("address", label = "Please type in a reference address: "),
-                       value = '900 Wilshire Blvd, Los Angeles, CA 90017, United States'),
-                   
-                   box(width = 4,
-                       actionButton("submitAddress", label = "Submit Address")),
-                   
-                   box(width = 6,
-                       google_mapOutput(outputId = "myMap", height = 620)
-                   ),
-                   
-                   box(width = 6,
-                       plotlyOutput(outputId = "inferencePlot", height = 620)
-                   )
-                   
-                   
-               )
-               
-               
-               
       ),
       
       tabPanel("Predefined Polygon Prediction", 
                
-               h3('Model Outputs'),
-               
-               sliderInput("slider1", h5("Select year"),
-                           min = 2010, max = 2020, value = 2020,
-                           step = 2),
-               
-               column(
-                 width = 12,
+               fluidRow(
                  
-                 # valueBoxOutput("info_box1", width = 12),
-                 valueBoxOutput("info_box2", width = 2),
-                 valueBoxOutput("info_box3", width = 2),
-                 valueBoxOutput("info_box4", width = 2),
-                 valueBoxOutput("info_box5", width = 2),
-                 valueBoxOutput("info_box6", width = 2),
-                 valueBoxOutput("info_box7", width = 2)
+                 HTML("<h3>&nbsp&nbsp&nbsp&nbspPredefined Polygon Model Outputs</h3>"),
                  
-               ),
-               
-               column(
-                 width = 12,
+                 column(width = 12,
+                        
+                        column(width = 2,
+                               
+                               pickerInput("specifyPolygon", h5("Select a zip code(s):"), 
+                                           choices = zipCodeList, 
+                                           options = list(`actions-box` = TRUE),
+                                           multiple = T,
+                                           selected = '90210'),
+                               
+                               
+                               # selectInput("specifyPolygon", h5("Select a zip code(s):"),
+                               #             choices = zipCodeList,
+                               #             selected = '90210',
+                               #             multiple = TRUE),
+                               
+                        ),
+                        
+                        column(width = 2,
+                               
+                               sliderInput("slider1", h5("Select year"),
+                                           min = 2010, max = 2020, value = 2020,
+                                           step = 2),
+                               
+                        ),
+                        
+                 ),
                  
-                 plotlyOutput('testPlot'),  
-                 
-               ),
-               
-               column(
-                 width = 12,
-                 fluidRow(
+                 column(
+                   width = 12,
                    
-                   column(4,
+                   # valueBoxOutput("info_box1", width = 12),
+                   valueBoxOutput("info_box2", width = 2),
+                   valueBoxOutput("info_box3", width = 2),
+                   valueBoxOutput("info_box4", width = 2),
+                   valueBoxOutput("info_box5", width = 2),
+                   valueBoxOutput("info_box6", width = 2),
+                   valueBoxOutput("info_box7", width = 2)
+                   
+                 ),
+                 
+                 column(
+                   width = 12,
+                   
+                   plotlyOutput('landCoveragePlot'),  
+                   
+                 ),
+                 
+                 column(
+                   width = 12,
+                   
+                   column(6,
                           
-                          selectInput("feature", h5("Select a feature"),
+                          plotlyOutput('affluencyCorrPlot', height = 500), 
+                          
+                   ),
+                   
+                   column(6,
+                          
+                          plotlyOutput('climateCorrPlot', height = 500), 
+                          
+                   ),
+                   
+                   column(1,
+                          
+                          selectInput("affluencyXAxis", h5("Select an x axis feature"),
                                       choices = features,
                                       selected = 'tree_area',
                                       multiple = FALSE),
+                   ),
+                   
+                   column(1,
+                          
+                          h6("Apply transformation to x axis?"),
+                          checkboxInput("affluencyXTransf", "Log", 
+                                        value = TRUE),
+                          
+                   ),
+                   
+                   column(1,
+                          
+                          selectInput("affluencyYAxis", h5("Select an y axis feature"),
+                                      choices = 'median_hh_income',
+                                      selected = 'median_hh_income',
+                                      multiple = FALSE),
+                   ),
+                   
+                   column(1,
+                          
+                          h6("Apply transformation to y axis?"),
+                          checkboxInput("affluencyYTransf", "Log", 
+                                        value = TRUE),
+                          
+                   ),
+                   
+                   column(2,
+                          
+                   ),
+                   
+                   column(1,
+                          
+                          selectInput("climateXAxis", h5("Select an x axis feature"),
+                                      choices = features,
+                                      selected = 'tree_area',
+                                      multiple = FALSE),
+                          
+                   ),
+                   
+                   column(1,
+                          
+                          h6("Apply transformation to x axis?"),
+                          checkboxInput("climateXTransf", "Log", 
+                                        value = TRUE),
+                          
+                   ),
+                   
+                   column(1,
+                          
+                          selectInput("climateYAxis", h5("Select an y axis feature"),
+                                      choices = climateFeature,
+                                      selected = 'lst_day_mean',
+                                      multiple = FALSE),
+                          
+                   ),
+                   
+                   column(1,
+                          
+                          h6("Apply transformation to y axis?"),
+                          checkboxInput("climateYTransf", "Log", 
+                                        value = TRUE),
+                          
+                   ),
+                   
+                   column(2,
+                          
                    ),
                    
                    column(12,
                           
                           column(6,
                                  
-                                 plotlyOutput('testPlot2', height = 500), 
+                                 verbatimTextOutput('affluencyRegression'),
+                                 
+                                 hr(),
+                                 hr(),
+                                 hr(),
                                  
                           ),
                           
                    ),
-                   
-                 )),
-               
-               hr(),
+                 ),
+                 
+               ),
                
       ),
       
@@ -306,58 +396,6 @@ mapLocation <- reactiveValues(a=c('34.1','-118.2'))
 ################################################################################
 
 server <- function(input, output, session) {
-  
-  observeEvent(input$polygon, {
-    
-    if (input$polygon == 2) {
-      
-      secondMenu <- polygonTypes
-      
-    } else if (input$polygon == 1) {
-      
-      secondMenu <- freehand
-      
-    } 
-    
-    updatePickerInput(
-      session,
-      inputId = "polygonType",
-      choices = secondMenu
-    )
-    
-  })
-  
-  observeEvent(input$polygonType, {
-    
-    if (input$polygonType == 'Zip Code') {
-      
-      thirdMenu <- zipCodeList
-      
-    } else if (input$polygonType == 'State') {
-      
-      thirdMenu <- stateList
-      
-    } else if (input$polygonType == 'County') {
-      
-      thirdMenu <- countyList
-      
-    } else if (input$polygonType == 'City') {
-      
-      thirdMenu <- cityList
-      
-    } else {
-      
-      thirdMenu <- 'Comming soon'
-      
-    } 
-    
-    updatePickerInput(
-      session,
-      inputId = "specifyPolygon",
-      choices = thirdMenu
-    )
-    
-  })
   
   output$myMap <- renderGoogle_map({
     
@@ -414,31 +452,15 @@ server <- function(input, output, session) {
     
     data <- dbGetQuery(con, query)
     
-    tryCatch({
-      
-      if (!is.null(input$specifyPolygon)) {
-        
-        data <- subset(data, subset = zipcode %in% input$specifyPolygon)
-        
-      }
-      
-    }, error = function(e) {
-      
-      if (!is.null(input$specifyPolygon)) {
-        
-        data <- subset(data, subset = city %in% input$specifyPolygon)
-        
-      }
-      
-    })
-    
   })
   
-  output$testPlot <- renderPlotly({
+  output$landCoveragePlot <- renderPlotly({
     
     tryCatch({
       
       data <- panelData()
+      
+      data <- subset(data, subset = zipcode %in% input$specifyPolygon)
       
       data <- data %>%
         select(6:10,12:14)
@@ -477,26 +499,171 @@ server <- function(input, output, session) {
       else if (input$slider1 == '2020') {Vvalue <- 6}
       
       ggplot(data = data, aes(x=year,y=value)) +
-        geom_line(aes(group = data$areaType), color = 'gray', size =2.5) +
-        geom_line(aes(group = data$areaType), color = data$color, size =2) +
+        geom_line(aes(group = data$areaType), color = 'gray', size = 4) +
+        geom_line(aes(group = data$areaType), color = data$color, size =3) +
         geom_point(data = pointData, aes(x=year,y=value), 
                    alpha = 0.8, color = 'orange', size=3) +
         geom_rect(aes(xmin = Vvalue-.05, xmax = Vvalue+.05,
                       ymin = 0, ymax = 1), fill = 'orange', alpha = 0.2) +
-        theme_bw() + 
+        theme_bw() +
+        theme(plot.background = element_rect(fill = "#F0F0F0")) +
         labs(title = "Land Coverage Area Evolution Period 2010:2020", 
              x = 'year', y = '% of total polygon area') +
-        ylim(0,1) 
+        ylim(0,1) +
+        scale_x_discrete(limits = c('2010','2012','2014','2016','2018','2020'), 
+                         expand = c(0, 0))
       
     }, error = function(e) {
       
-      ggplot()
+      ggplot() + 
+        theme(plot.background = element_rect(fill = "#F0F0F0")) 
       
     })
     
   })
   
-  output$testPlot2 <- renderPlotly({
+  affluencyPlotData <- reactive({
+    
+    data <- panelData()
+    
+    data <- subset(data, subset = year == input$slider1)
+    
+    data[,8:14] <- data[,8:14]/data$polygon_area
+    
+    queryC <- as.character('SELECT * FROM \"public\".\"median_income\"')
+    
+    climateData <- dbGetQuery(con, queryC)
+    
+    dependentVariable <- paste0('y',as.character(input$slider1))
+    
+    climateData <- climateData %>%
+      select(zipcode,dependentVariable)
+    
+    names(climateData)[2] <- 'median_hh_income'
+    
+    climateData <- na.omit(climateData)
+    
+    data <- left_join(data,climateData, by='zipcode')
+    
+    rm(climateData)
+    
+    xAxis <- as.character(input$affluencyXAxis)
+    
+    data <- data %>%
+      select(zipcode,xAxis,median_hh_income)
+    
+    return(data)
+    
+  })
+  
+  output$affluencyCorrPlot <- renderPlotly({
+    
+    tryCatch({
+      
+      data <- affluencyPlotData()
+      
+      xAxis <- as.character(input$affluencyXAxis)
+      
+      median_hh_income <- 'median_hh_income'
+      zipcode <- 'zipcode'
+      
+      if (input$affluencyXTransf == TRUE) {
+        
+        data[[xAxis]] <- log(data[[xAxis]])
+        
+      }
+      
+      if (input$affluencyYTransf == TRUE) {
+        
+        data[[median_hh_income]] <- log(data[[median_hh_income]])
+        
+        yAxisLabel <- paste0("Log of Median Household Income (USD)")
+        
+      } else {
+        
+        yAxisLabel <- "Median Household Income (USD)"
+        
+      }
+      
+      pointColor <- 'gray'
+      
+      dataSub <- subset(data, subset = zipcode %in% input$specifyPolygon)
+      
+      ggplot(data = data, aes_string(x=xAxis,y=median_hh_income)) + 
+        geom_point(size = .1, color = 'white') + 
+        geom_smooth(method = 'lm') + 
+        geom_point(data=data, size = 2, color = pointColor,
+                   aes_string(x=xAxis,y=median_hh_income, value = zipcode)) +
+        geom_point(data = dataSub, aes_string(x=xAxis,y=median_hh_income,
+                                              color = zipcode),
+                   size=3) +
+        theme_bw() +
+        theme(plot.background = element_rect(fill = "#F0F0F0")) +
+        theme(legend.position='none') +
+        labs(title = 'Land Coverage vs Median Household Income',
+             x = xAxis,
+             y = yAxisLabel)
+      
+    }, error = function(e) {
+      
+      ggplot() + 
+        theme(plot.background = element_rect(fill = "#F0F0F0")) 
+      
+    })
+    
+  })
+  
+  output$affluencyRegression <- renderPrint({
+    
+    tryCatch({
+    
+    data <- affluencyPlotData()
+    
+    xAxis <- as.character(input$affluencyXAxis)
+    
+    median_hh_income <- 'median_hh_income'
+    
+    if (input$affluencyXTransf == TRUE) {
+      
+      data <- subset(data, subset = xAxis > 1)
+      
+      data[[xAxis]] <- log(data[[xAxis]])
+      
+    }
+    
+    if (input$affluencyYTransf == TRUE) {
+      
+      data <- subset(data, subset = median_hh_income > 1)
+      
+      data[[median_hh_income]] <- log(data[[median_hh_income]])
+      
+    } 
+    
+    data <- data[rowSums(sapply(data[-ncol(data)], is.infinite)) == 0, ]
+    
+    data <- na.omit(data)
+    
+    modelFormula <- paste0(median_hh_income,"~",xAxis)
+    
+    model <- lm(as.formula(modelFormula), data = data)
+    
+    totalRobust <- coeftest(model, vcov = vcovHC(model, type = 'HC3'))
+    
+    cInterval <- coefci(model, vcov. = vcovHC(model, type = 'HC3'))
+    
+    print(totalRobust)
+    
+    print(cInterval)
+    
+    }, error = function(e) {
+      
+      print('No values to make regression with')
+      
+    })
+    
+  })
+  
+  output$climateCorrPlot <- renderPlotly({
     
     tryCatch({
       
@@ -506,14 +673,16 @@ server <- function(input, output, session) {
       
       data[,8:14] <- data[,8:14]/data$polygon_area
       
-      queryC <- as.character('SELECT * FROM \"public\".\"median_income\"')
+      queryD <- as.character('SELECT * FROM \"public\".\"panel_microclimate\"') 
       
-      climateData <- dbGetQuery(con, queryC)
+      climateData <- dbGetQuery(con, queryD)
       
-      dependentVariable <- paste0('y',as.character(input$slider1))
+      climateData <- subset(climateData, subset = year == input$slider1)
+      
+      climateFeature <- input$climateYAxis
       
       climateData <- climateData %>%
-        select(zipcode,dependentVariable)
+        select(zipcode,climateFeature)
       
       names(climateData)[2] <- 'dependentVariableB'
       
@@ -523,7 +692,7 @@ server <- function(input, output, session) {
       
       rm(climateData)
       
-      selectFeature <- as.character(input$feature)
+      selectFeature <- as.character(input$climateXAxis)
       
       data <- data %>%
         select(zipcode,selectFeature,dependentVariableB)
@@ -531,18 +700,38 @@ server <- function(input, output, session) {
       dependentVariableB <- 'dependentVariableB'
       zipcode <- 'zipcode'
       
-      data[[selectFeature]] <- log(data[[selectFeature]])
-      data[[dependentVariableB]] <- log(data[[dependentVariableB]])
+      if (input$climateXTransf == TRUE) {
+        
+        data[[selectFeature]] <- log(data[[selectFeature]])
+        
+      }
+      
+      if (input$climateYTransf == TRUE) {
+        
+        data[[dependentVariableB]] <- log(data[[dependentVariableB]])
+        
+      }
+      
+      pointColor <- 'gray'
+      
+      dataSub <- subset(data, subset = zipcode %in% input$specifyPolygon)
       
       ggplot(data = data, aes_string(x=selectFeature,y=dependentVariableB)) + 
-        geom_point(size = 2, aes(color = data$zipcode)) + 
+        geom_point(size = .1, color = 'white') + 
         geom_smooth(method = 'lm') + 
-        theme_bw() + 
+        geom_point(data=data, size = 2, color = pointColor,
+                   aes_string(x=selectFeature,y=dependentVariableB, value = zipcode)) +
+        geom_point(data = dataSub, aes_string(x=selectFeature,y=dependentVariableB,
+                                              color = zipcode),
+                   size=3) +
+        theme_bw() +
+        theme(plot.background = element_rect(fill = "#F0F0F0")) +
         theme(legend.position='none')
       
     }, error = function(e) {
       
-      ggplot()
+      ggplot() + 
+        theme(plot.background = element_rect(fill = "#F0F0F0")) 
       
     })
     
@@ -1050,7 +1239,7 @@ server <- function(input, output, session) {
   
   output$inferencePlot <- renderPlotly({
     
-    data <- fread('C:/Users/crort/OneDrive/Desktop/CapstoneProject/inferencePlot.csv')
+    data <- fread('inferencePlot.csv')
     
     ggplot(data = data, aes(x=xCoord,y=yCoord,fill = value)) + 
       geom_tile()+ 

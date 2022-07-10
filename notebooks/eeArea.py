@@ -24,9 +24,9 @@ def area_calculation(image, class_number, shape, pixel_scale = 20):
 
     area_sq_m = area.getInfo().get('classification')
 
-    #area_sq_km = area_sq_m / 1e6
+    area_sq_km = area_sq_m / 1e6
 
-    return area_sq_m
+    return area_sq_km
 
 
 

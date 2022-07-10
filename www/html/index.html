@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>CityAnalytics</title>
+  <title>Urban Insights</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -45,7 +45,7 @@
     <div class="container d-flex align-items-center">
 
       <div class="logo mr-auto">
-        <h1 class="text-light"><a href="index.html">CityAnalytics</a></h1>
+        <h1 class="text-light"><a href="index.html">Urban Insights</a></h1>
         <!-- Uncomment below if you prefer to use an image logo -->
         <!-- <a href="index.html"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
       </div>
@@ -54,7 +54,8 @@
         <ul>
           <li class="active"><a href="index.html">Home</a></li>
           <li><a href="#about">About</a></li>
-          <li><a href="#services">Product Demo</a></li>
+          <li><a href="#services">Demonstration</a></li>
+		  <li><a href="https://carlos-ortiz.shinyapps.io/CapstoneProject/">Insights Analyzer</a></li>
           <li><a href="#user">User Guide</a></li>
 		  <li><a href="#team">Our Team</a></li>
           <li><a href="#contact">Contact Us</a></li>
@@ -73,8 +74,8 @@
       <!-- Slide 1 -->
       <div class="carousel-item active">
         <div class="carousel-container">
-          <h2 class="animate__animated animate__fadeInDown">Welcome to <span>CityAnalytics</span></h2>
-          <p class="animate__animated fanimate__adeInUp">A project that detects landcover from aerial imagery</p>
+          <h2 class="animate__animated animate__fadeInDown">Welcome to <span>Urban Insights</span></h2>
+          <p class="animate__animated fanimate__adeInUp">Better choices for healthier cities… One pixel at a time!</p>
           <a href="#about" class="btn-get-started animate__animated animate__fadeInUp scrollto">Read More</a>
         </div>
       </div>
@@ -97,17 +98,20 @@
         <div class="row content" data-aos="fade-up">
           <div class="col-lg-6">
             <p>
-              Legionnaires’ disease is a severe pneumonia with a 1 in 10 fatality rate. When a potential outbreak occurs in a community, cooling towers are often suspected as the source because they can harbor <i>Legionella</i> bacteria. 
+              Western US is experiencing its worst period of drought in 1200 years, with extreme dryness ravaging the area for more than 2 decades. Shrunken reservoirs, depleted aquifers, low rivers and raging wildfire – that is the current state of California with about 93% of the state under drought. Lake Mead and Lake Powell, the country's two largest reservoirs, are filled at only about one-third of their total capacity. In spite of this, Californians used 26% more water in April of 2022 as compared to April of 2021, with about 33% of the water usage for residential outdoors. 
             </p>
             <p>
-			  Outbreak investigators often manually search aerial imagery to find cooling towers. This requires expertise and time. 
+			  Due to this, there is an overall push across the state to convert urban green vegetation into drought tolerant vegetation. However, for policy makers, city planners and builders, there is no clear insight into the area of residential outdoor landscape, urban outdoor water usage and the impact of converting lawns into drought tolerant vegetation on microclimate. 
             </p>
-          </div>
-          <div class="col-lg-6 pt-4 pt-lg-0">
-            <p>
-              CityAnalytics uses machine learning to automatically detect visible cooling towers from aerial imagery. This accelerates outbreak response efforts so that investigators can treat contaminated cooling towers faster, stopping further spread of disease.
+          <!-- </div>
+          <div class="col-lg-6 pt-4 pt-lg-0">-->
+			<p>
+			  This is where Urban Insights fit in. Our mission is to identify irrigated vegetation including lawns and trees along with other landscapes including water, soil, and impervious surfaces. Using geographical data, aerial imagery, and advanced AI and ML techniques, the primary objective is to provide insights drive policies and plans aimed at reducing water usage with minimal adverse effects on urban micro climate. 
             </p>
             <a href="#features" class="btn-learn-more">Learn More</a>
+          </div>
+		  <div class="col-lg-6 order-1 order-lg-2 text-center">
+				<img src="assets/img/map.gif" alt="" class="img-fluid">
           </div>
         </div>
 
@@ -151,7 +155,7 @@
               <div class="col-lg-6 order-2 order-lg-1 mt-3 mt-lg-0">
                 <h3>Training Data</h3>
                 <p>
-                  The model uses data from several cities to learn how to detect cooling towers. Our training data come from all over the United States and include dense urban residential areas, business districts, industrial complexes, and smaller cities. 
+                  Our dataset is accessed via the Google Earth Engine API, comprising of aerial imagery. We have used the image data from National Agricultural Imagery set. It consists of red, green, blue and near infrared bands. Using these 4 bands, we performed transformations and manipulations to access additional characteristics used as features in our model. Combining this with our few other datasets such as US Census Data, Land Surface Temperature and Emissivity Data. 
                 </p>
 				  <!--
 				<ul>
@@ -161,29 +165,30 @@
 				  <li><i class="ri-check-double-line"></i> Seattle, Las Vegas, Baton Rouge, Disneyland Park, and Irvine, California</li>
                 </ul> -->
                 <p>
-                  Through a process of data augmentation, we improve how our model performs on the visually diverse communities across the country. Basic augmentation techniques generate slightly altered versions of the original image, and synthetic augmentation creates new examples that focus on difficult, rare, or unusual cooling towers or landscapes.   
+                  We have trained our data on Los Angeles county in California, USA.    
                 </p>
               </div>
               <div class="col-lg-6 order-1 order-lg-2 text-center">
-                <img src="assets/img/features-1.png" alt="" class="img-fluid">
+                <img src="assets/img/datasets.png" alt="" class="img-fluid">
               </div>
             </div>
           </div>
+
           <div class="tab-pane" id="tab-2">
             <div class="row">
               <div class="col-lg-6 order-2 order-lg-1 mt-3 mt-lg-0">
-                <h3>YOLOV5 and EfficientNet</h3>
+                <h3>Google Earth Engine and Tensor Flow</h3>
                 <p class="font-italic">
-                  An optimized two-stage model
+                  An two-stage model
                 </p>
                 <p>
-                  CityAnalytics uses a two-stage model to help it find every cooling tower without also flagging other objects that resemble towers. The first stage uses YOLOv5 ("You Only Look Once"), a neural network model that identifies objects. As the title suggests, the model is a “single shot detector”, meaning it looks at the whole image at once and tries to identify the relevant areas of interest. This makes it extremely fast, while still providing fantastic performance.
+                  Urban Insights uses Google Earth Engine API and Tensor Flow models
 				</p>
 				<p>
-					We specifically leveraged the largest version of YOLOv5, called YOLOv5 XL, with pretrained weights from the COCO dataset. The model was fine-tuned for 100 epochs on a V100 GPU, and performance was evaluated using a custom evaluation metric which is aligned to the true evaluation process of our stakeholders. An optimal inference confidence threshold range was also established and used to create the default search band within the user inference.
+					To be added.
                 </p>
 				<p>
-					We trained YOLOv5 to avoid missing towers, even if that meant it was overly sensitive. Potential cooling towers detected by YOLOv5 were cropped and sent to the second stage, EfficientNet B5. EfficientNet is a neural network model that classifies images into groups; in this case, it classifies the detected objects into real cooling towers versus imposters, such as patio umbrellas and skylights. 
+					To be added. 
                 </p>
 				<!-- =======================================================
                 <ul>
@@ -195,8 +200,8 @@
   				======================================================== -->
               </div>
               <div class="col-lg-6 order-1 order-lg-2 text-center">
-				<img src="assets/img/finetune.gif" alt="" class="img-fluid">
-                <img src="assets/img/features-2.gif" alt="" class="img-fluid">
+				<!-- SM<img src="assets/img/finetune.gif" alt="" class="img-fluid">-->
+                <!-- SM<img src="assets/img/features-2.gif" alt="" class="img-fluid">-->
 				  
               </div>
             </div>
@@ -206,7 +211,7 @@
               <div class="col-lg-6 order-2 order-lg-1 mt-3 mt-lg-0">
                 <h3>Performance</h3>
                 <p>
-                  Our objective was to avoid missing towers (false negatives), as this type of error would be the most detrimental for outbreak investigators. Our best model detected aerially visible cooling towers with 95.1% sensitivity and 90.0% specificity, often identifying cooling towers that human reviewers failed to recognize on initial review.
+                  To be added. 
                 </p>
 				  
 				  <!-- =======================================================
@@ -222,7 +227,7 @@
 ======================================================== -->
               </div>
               <div class="col-lg-6 order-1 order-lg-2 text-center">
-                <img src="assets/img/features-3.png" alt="" class="img-fluid">
+                <!-- SM <img src="assets/img/features-3.png" alt="" class="img-fluid"> -->
               </div>
             </div>
           </div>
@@ -231,7 +236,7 @@
               <div>
                 <h3>Application</h3>
                 <p>
-                  Towerscout is hosted on AWS in Python flask, and uses either Google Maps or Microsoft Bing maps as a UI and backend tile source. Place outline data is retrieved from OpenStreetMap, and zip code searches are enabled through 2010 census zip code.
+                  Urban Insights is hosted on AWS. Urban Insights API (microservice) is hosted using FastAPI on uvicorn. The landcover data is processed using GEE models and available in the database. The API and the database are used by R and ShinyApp to display panel analysis and execute queries. 
                 </p>
 				 <p>  </p>
 
@@ -247,13 +252,16 @@
 
 -->
               </div>
-              <div class="col-lg-6 order-1 order-lg-2 text-center">
+              <div class="col-lg-16 order-1 order-lg-2 text-center">
 				<img src="assets/img/architecture.png" alt="" class="img-fluid">
 				
               </div>
-			<div class="col-lg-6 order-2 order-lg-2 text-center">
-                <img src="assets/img/interface.png" alt="" class="img-fluid">
-				
+			
+			  <p class="font-italic">
+			  <div class="col-lg-5 order-2 order-lg-2 text-center"> 
+ 			
+				<img src="assets/img/interface.png" alt="" class="img-fluid">
+			  </p>
               </div>
             </div>
           </div>
@@ -276,29 +284,29 @@
             <div class="icon-box" data-aos="zoom-in-left">
               <div class="icon"><i class="las la-basketball-ball" style="color: #ff689b;"></i></div>
               <h4 class="title">Efficiency</h4>
-               <p class="description">Identify cooling towers in minutes</p> 
+               <p class="description">Identify land covers across zip codes and custom areas in minutes using webapp or API</p> 
             </div>
           </div>
           <div class="col-lg-4 col-md-6 mt-5 mt-md-0">
             <div class="icon-box" data-aos="zoom-in-left" data-aos-delay="100">
               <div class="icon"><i class="las la-book" style="color: #e9bf06;"></i></div>
-              <h4 class="title">Flexible Search</h4>
-				<p class="description">Search by radius, custom polygon, or place outline</p> 
+              <h4 class="title">Affluency Insights</h4>
+				<p class="description">Analyze the impact of affluency on land covers</p> 
             </div>
           </div>		
           <div class="col-lg-4 col-md-6 mt-5 mt-lg-0 ">
             <div class="icon-box" data-aos="zoom-in-left" data-aos-delay="200">
               <div class="icon"><i class="las la-file-alt" style="color: #3fcdc7;"></i></div>
-              <h4 class="title">Registry Creation</h4>
-				<p class="description">Customize datasets to create cooling tower registries or new training data</p> 
+              <h4 class="title">Microclimate Insights</h4>
+				<p class="description">Analyze trends on microclimate in neighborhoods with varying land covers</p> 
             </div>
           </div>	
 			
 	      <div class="col-md-6 col-lg-8 mt-5">
 			<div class="icon-box" data-aos="zoom-in-left" data-aos-delay="200">
-			  <h4 class="title"><a href="">Onboarding Video</a></h4>
+			  <h4 class="title"><a href="">Demonstration Video</a></h4>
 				
-				<iframe width="560" height="315" src="https://www.youtube.com/embed/arVGjexxTDM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+ 				<iframe width="560" height="315" src="https://youtu.be/QA26djKi1aM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 	        </div>	
           </div>  
@@ -326,10 +334,11 @@
           <div class="testimonial-item">
             <p>
               <i class="bx bxs-quote-alt-left quote-icon-left"></i>
-              The <em style="font-style: normal;">Legionella</em> team is excited about the CityAnalytics resource for identifying visible cooling towers using aerial satellite imagery. During outbreak investigations, CityAnalytics enables us to quickly identify visible cooling towers using this automated tool rather than manually searching across images, which is a time- and personnel-intensive process. Additionally, CityAnalytics may enable public health to prospectively identify cooling towers for building a registry or conducting outreach. By sharing water management program and <em style="font-style: normal;">Legionella</em> control resources with cooling tower owners, public health can work towards preventing future outbreaks of Legionnaires’ disease.
+			  <i class="bx bxs-quote-alt-right quote-icon-right"></i>
+              <!--  SM The <em style="font-style: normal;"></em> team is excited about the Urban Insights resource for identifying visible cooling towers using aerial satellite imagery. During outbreak investigations, Urban Insights enables us to quickly identify visible cooling towers using this automated tool rather than manually searching across images, which is a time- and personnel-intensive process. Additionally, Urban Insights may enable public health to prospectively identify cooling towers for building a registry or conducting outreach. By sharing water management program and <em style="font-style: normal;">Legionella</em> control resources with cooling tower owners, public health can work towards preventing future outbreaks of Legionnaires’ disease. -->
             </p>
-            <img src="assets/img/testimonials/testimonials-1.png" class="testimonial-img" alt="">
-            <h3>CDC <i>Legionella</i> Team</h3>
+            <!--  SM <img src="assets/img/testimonials/testimonials-1.png" class="testimonial-img" alt=""> -->
+            <!--  SM <h3>CDC <i>Legionella</i> Team</h3> -->
           </div>
         </div>
 
@@ -353,16 +362,16 @@
             <a data-toggle="collapse" class="" href="#faq1">How do I search a new area?<i class="icofont-simple-up"></i></a>
             <div id="faq1" class="collapse show" data-parent=".faq-list">
               <p>
-                In the search bar, you can search for a place, and then zoom and pan as with most maps. You can also center a particular point and create a search circle by defining the radius in meters. Lastly, you can define a search area by drawing a custom polygon on the screen.
+                To be added. 
               </p>
             </div>
           </li>
 
           <li data-aos="fade-up" data-aos-delay="200">
-            <a data-toggle="collapse" href="#faq2" class="collapsed">How do I manually correct results?<i class="icofont-simple-up"></i></a>
+            <a data-toggle="collapse" href="#faq2" class="collapsed">How do I manually enter zipcode?<i class="icofont-simple-up"></i></a>
             <div id="faq2" class="collapse" data-parent=".faq-list">
               <p>
-                After clicking “Find towers,” you can click towers on the map to show their address and the model’s confidence level that it is a cooling tower. Unselect objects that are not towers by unchecking the box in the results panel. If the model missed a tower, mark it by drawing a box around it, and then click “Add locations.” The review bar on the right can help us quickly flip through tiles or detections. When we are satisfied with the results of our search, we can download the results and receive them as both a CSV file and a KML file to view in Google MyMaps or Google Earth.
+                To be added. 
 
               </p>
             </div>
@@ -372,7 +381,7 @@
             <a data-toggle="collapse" href="#faq3" class="collapsed">How do I save search results?<i class="icofont-simple-up"></i></a>
             <div id="faq3" class="collapse" data-parent=".faq-list">
               <p>
-                Click “Download results” to save CSV and KML files of your results. This will include any manually corrections you have made. Click “Download dataset” to download image tiles and annotations. 
+                To be added. 
               </p>
             </div>
           </li>
@@ -383,16 +392,16 @@
             <a data-toggle="collapse" href="#faq4" class="collapsed">How do I load a dataset for viewing and editing?<i class="icofont-simple-up"></i></a>
             <div id="faq4" class="collapse" data-parent=".faq-list">
               <p>
-                A dataset that has been previously customized and downloaded can be restored by uploading the ZIP file with the “Restore dataset” button. 
+                To be added.
               </p>
             </div>
           </li>
 
           <li data-aos="fade-up" data-aos-delay="500">
-            <a data-toggle="collapse" href="#faq5" class="collapsed">How do I use Label mode?<i class="icofont-simple-up"></i></a>
+            <a data-toggle="collapse" href="#faq5" class="collapsed">How do I use save regression results?<i class="icofont-simple-up"></i></a>
             <div id="faq5" class="collapse" data-parent=".faq-list">
               <p>
-				Label mode is useful when creating a cooling tower registry or a new training dataset. When you switch into this mode, the tool will show all results on any tile scanned, even if only part of the tile is inside the specified search boundary. It will also lower the confidence threshold to make sure you are not missing any detections. You can review all tiles by clicking the “>” button next to “Tile” to manually add any missed towers., After that process is complete, you can review all detections using the “>” button next to “Det.” to quickly uncheck any objects that are not towers. When you are finished, download the dataset (click “Download dataset”); this includes labelled images which can be used for additional model training and empty tiles. You can also click “Download results” to save a CSV or KML that includes the addresses of the towers. 
+				To be added. 
               </p>
             </div>
           </li>
@@ -413,17 +422,33 @@
 
         <div class="row">
 
+
+          <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
+            <div class="member" data-aos="fade-up" data-aos-delay="300">
+              <div class="member-img">
+                <img src="assets/img/team/team-5.png" class="img-fluid" alt="">
+                <div class="social">
+                  <a href="https://www.linkedin.com/in/orgoca/"><i class="icofont-linkedin"></i></a>
+                </div>
+              </div>
+              <div class="member-info">
+                <h4>Carlos R. Ortiz-Gomez</h4>
+                <span>Data Scientist</span>
+              </div>
+            </div>
+          </div>
+
           <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
             <div class="member" data-aos="fade-up">
               <div class="member-img">
                 <img src="assets/img/team/team-1.jpg" class="img-fluid" alt="">
                 <div class="social">
-                  <a href="https://www.linkedin.com/in/karenkwong"><i class="icofont-linkedin"></i></a>
+                  <a href="https://www.linkedin.com/in/diana-chacon/"><i class="icofont-linkedin"></i></a>
                 </div>
               </div>
               <div class="member-info">
-                <h4>Karen Wong</h4>
-                <span>Physician, Epidemiologist</span>
+                <h4>Diana Chacon</h4>
+                <span>Hydrogeologist, Data Scientist, Project Manager</span>
               </div>
             </div>
           </div>
@@ -433,27 +458,12 @@
               <div class="member-img">
                 <img src="assets/img/team/team-2.jpg" class="img-fluid" alt="">
                 <div class="social">
-                  <a href="https://www.linkedin.com/in/thaddeussegura"><i class="icofont-linkedin"></i></a>
+                  <a href="https://www.linkedin.com/in/hassansaad1/"><i class="icofont-linkedin"></i></a>
                 </div>
               </div>
               <div class="member-info">
-                <h4>Thaddeus Segura</h4>
-                <span>Product Manager</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
-            <div class="member" data-aos="fade-up" data-aos-delay="200">
-              <div class="member-img">
-                <img src="assets/img/team/team-3.jpg" class="img-fluid" alt="">
-                <div class="social">
-                  <a href="https://www.linkedin.com/in/gunnarmein"><i class="icofont-linkedin"></i></a>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Gunnar Mein</h4>
-                <span>Software Engineer, Teacher</span>
+                <h4>Hassan Saad</h4>
+                <span>Data Scientist</span>
               </div>
             </div>
           </div>
@@ -463,16 +473,61 @@
               <div class="member-img">
                 <img src="assets/img/team/team-4.jpg" class="img-fluid" alt="">
                 <div class="social">
-                  <a href="https://www.linkedin.com/in/jia-lu-gracie-a8b5a71a"><i class="icofont-linkedin"></i></a>
+                  <a href="https://www.linkedin.com/in/jorge-dayer-427300133/"><i class="icofont-linkedin"></i></a>
                 </div>
               </div>
               <div class="member-info">
-                <h4>Jia Lu</h4>
+                <h4>Jorge Dayer</h4>
                 <span>Data Scientist</span>
               </div>
             </div>
           </div>
+		  
+          <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
+            <div class="member" data-aos="fade-up" data-aos-delay="300">
+              <div class="member-img">
+                <img src="assets/img/team/team-6.png" class="img-fluid" alt="">
+                <div class="social">
+                  <a href="https://www.linkedin.com/in/samtemlock/"><i class="icofont-linkedin"></i></a>
+                </div>
+              </div>
+              <div class="member-info">
+                <h4>Sam Temlock</h4>
+                <span>Data Scientist</span>
+              </div>
+            </div>
+          </div>
+		  
+          <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
+            <div class="member" data-aos="fade-up" data-aos-delay="200">
+              <div class="member-img">
+                <img src="assets/img/team/team-3.jpg" class="img-fluid" alt="">
+                <div class="social">
+                  <a href="https://www.linkedin.com/in/sudhrity/"><i class="icofont-linkedin"></i></a>
+                </div>
+              </div>
+              <div class="member-info">
+                <h4>Sudhrity Mondal</h4>
+                <span>Solutions Architect, Project & Product Manager</span>
+              </div>
+            </div>
+          </div>
 
+          <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
+            <div class="member" data-aos="fade-up" data-aos-delay="300">
+              <div class="member-img">
+                <img src="assets/img/team/team-7.jpeg" class="img-fluid" alt="">
+                <div class="social">
+                  <a href="https://www.linkedin.com/in/khandelwalvaishali/"><i class="icofont-linkedin"></i></a>
+                </div>
+              </div>
+              <div class="member-info">
+                <h4>Vaishali Khandelwal</h4>
+                <span>Data Scientist</span>
+              </div>
+            </div>
+          </div>
+		  
         </div>
 
       </div>
@@ -495,7 +550,7 @@
 				  <div class="address">
 					<i class="icofont-envelope"></i>
 					<h4>Email:</h4>
-					<p>info.towerscout@gmail.com</p>
+					<p>urbaninsights.ai@gmail.com</p>
 				  </div>
 				</div>
 			 </div>
@@ -506,7 +561,7 @@
 					<i class="icofont-github"></i>
 					<p> </p>
 					<h4>Project Repository:</h4>
-					<p><a href="https://github.com/CityAnalytics/CityAnalytics">https://github.com/CityAnalytics/CityAnalytics</a></p>
+					<p><a href="https://github.com/urbaninsights">https://github.com/urbaninsights</a></p>
 					</div>
 				  </div>
 					
@@ -526,8 +581,8 @@
   <!-- ======= Footer ======= -->
   <footer id="footer">
     <div class="container">
-      <h3>CityAnalytics</h3>
-      <p>A tool that automatically detects cooling towers from satellite imagery.</p>
+      <h3>Urban Insights</h3>
+      <p>Solutions for a better planet.</p>
 
 
   </footer><!-- End Footer -->
@@ -546,7 +601,13 @@
 
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
-
+<script type="text/javascript"> //<![CDATA[
+	  var tlJsHost = ((window.location.protocol == "https:") ? "https://secure.trust-provider.com/" : "http://www.trustlogo.com/");
+	  document.write(unescape("%3Cscript src='" + tlJsHost + "trustlogo/javascript/trustlogo.js' type='text/javascript'%3E%3C/script%3E"));
+	//]]></script>
+<script language="JavaScript" type="text/javascript">
+	  TrustLogo("https://www.positivessl.com/images/seals/positivessl_trust_seal_lg_222x54.png", "POSDV", "none");
+</script>
 </body>
 
 </html>

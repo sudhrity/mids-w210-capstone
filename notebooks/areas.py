@@ -3,7 +3,7 @@ import json
 
 from eeImage import get_images
 #from gee_generate_panel_data_zipcode_db_v0704 import get_images, clf, BANDS, area_calculation, get_areas  
-from eeModel import clf, BANDS
+from eeModel import training_image_classified, BANDS#, clf
 from eeArea import area_calculation, get_areas
 import ee
 
@@ -17,9 +17,9 @@ params = {
 
 images = get_images(params)
 
-rf_model = clf
 bands = BANDS
-training_image_classified = images['2020_la_county'].select(bands).classify(rf_model)
+# rf_model = clf
+# training_image_classified = images['2020_la_county'].select(bands).classify(rf_model)
 
 
 def get_coordinate_list(json_polygon):

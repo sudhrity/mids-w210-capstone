@@ -3,6 +3,9 @@ from enum import Enum
 import ee
 from eeImage import get_images
 
+# Initialize GEE
+ee.Initialize()
+
 # Model variables
 LABEL = 'landcover'
 BANDS = ['R', 
@@ -19,31 +22,14 @@ CLASSES = ['water',
            'turf',
            'impervious',
            'soil']
+OLD_CLASSES = ['water_pools'] + CLASSES[1:]
+
+# Change classes to include lakes
+NEW_CLASSES = OLD_CLASSES + ['water_natural']
+NEW_CLASSES[0] = 'water_pools'
 
 
-# class ClassEnum(Enum):
-
-#   '''
-#   Enum class for mapping classes to new integers
-#   '''
-
-#   WATER = (1, 0)
-#   TREES = (2, 1)
-#   GRASS = (3, 2)
-#   TURF = (4, 3)
-#   IMPERVIOUS = (6, 4)
-#   SOIL = (7, 5)
-
-# def conditional_class(cls):
-#     '''
-#     Remaps class labels based on ClassEnum mapping
-#     '''
-#   def map_feature(feat):
-#     mapper = ClassEnum[cls].value
-#     return ee.Algorithms.If(ee.Number(feat.get('landcover')).eq(mapper[0]),feat.set({'landcover': mapper[1]}),feat)
-#   return map_feature
-
-def get_TF_classified_image(image, bands, tf_model, classes):
+def get_TF_classified_image(image, bands, tf_model, classes, name='classification'):
     
     '''
     Use a TF model hosted on Google AI Platform to classify an EE image.
@@ -54,58 +40,66 @@ def get_TF_classified_image(image, bands, tf_model, classes):
 
     # Get the predictions
     predictions = tf_model.predictImage(selected_image.float().toArray())
-    classified_image = predictions.arrayArgmax().arrayGet([0]).rename('classification')
+    probabilities = predictions.arrayFlatten([classes])
+    classified_image = predictions.arrayArgmax().arrayGet([0]).rename(name)
     
-    return classified_image
+    return classified_image, predictions, probabilities
 
 
+def get_ensembled_classified_image(image, bands, model_dicts, combined_name='combined_classification'):
+    
+    """
+    Get the ensembled classified image by getting the max prediction probability
+    for each pixel across all models. 
+    
+    Each dict in model_dicts should contain at a minimum the following keys for a particular model:
+        'model': the ee.Model object
+        'classes': the classes that the model will try to predict
+        'image_name': the name of the classified image from the model 
+    """
+    
+    output_images = []
+    combined_probs = None
+    
+    for model_dict in model_dicts:
+        # Unpack the model metadata
+        model = model_dict['model']
+        classes = model_dict['classes']
+        image_name = model_dict['image_name']
+        
+        # Predict on classified image
+        temp_image, temp_preds, temp_probs = get_TF_classified_image(image, bands, model, classes, name=image_name)
+        
+        # If no combined_probs set, set it to temp_probs
+        if combined_probs is None:
+            combined_probs = temp_probs
+        
+        # Check if classes are not the same, then add missing bands 
+        cur_prob_bands = set(combined_probs.bandNames().getInfo())
+        add_cur_bands = list(cur_prob_bands - set(classes))
+        add_new_bands = list(set(classes) - cur_prob_bands)
+        
+        if add_cur_bands:
+            temp_probs = temp_probs.addBands(combined_probs, add_cur_bands)
+        if add_new_bands:
+            combined_probs = combined_probs.addBands(temp_probs, add_new_bands)
+        
+        # Get the max probs across the two images
+        combined_probs = combined_probs.max(temp_probs)
+        output_images.append(temp_image)
+    
+    # Get the final combined classification image based on maximum probabilities
+    classified_image = combined_probs.toArray().arrayArgmax().arrayGet([0]).rename(combined_name)
+    output_images.append(classified_image)
+    
+    return output_images
 
 
-ee.Initialize()
+# Generate training image
 
 counties = ee.FeatureCollection("TIGER/2018/Counties")
 la_county = counties.filter(ee.Filter.eq('NAME', 'Los Angeles'))
 
-# PROJECT_DIR = 'projects/california-lawn-detection/assets/'
-
-
-# # Create the labeled feature collection set for train data
-# water_1 = ee.FeatureCollection(f"{PROJECT_DIR}water_torrance_0610")
-# water_2 = ee.FeatureCollection(f"{PROJECT_DIR}water_torrance_0701_400")
-# vegetation_trees = ee.FeatureCollection(f"{PROJECT_DIR}trees_torrance")
-# vegetation_grass = ee.FeatureCollection(f"{PROJECT_DIR}grass_torrance").limit(400)
-# turf_1 = ee.FeatureCollection(f"{PROJECT_DIR}turf_torrance1")
-# turf_2 = ee.FeatureCollection(f"{PROJECT_DIR}turf_torrance2")
-# impervious_1 = ee.FeatureCollection(f"{PROJECT_DIR}impervious_torrance1").limit(35)
-# impervious_2 = ee.FeatureCollection(f"{PROJECT_DIR}impervious_torrance2").limit(35)
-# soil = ee.FeatureCollection(f"{PROJECT_DIR}soil_reduced_070222")
-
-# water = water_1.merge(water_2)
-# turf = turf_1.merge(turf_2)
-# impervious= impervious_1.merge(impervious_2)
-
-# # Remap old labels to new labels per class
-# water_tr = water.map(conditional_class('WATER'))
-# trees_tr = vegetation_trees.map(conditional_class('TREES'))
-# grass_tr = vegetation_grass.map(conditional_class('GRASS'))
-# turf_tr = turf.map(conditional_class('TURF'))
-# impervious_tr = impervious.map(conditional_class('IMPERVIOUS'))
-# soil_tr = soil.map(conditional_class('SOIL'))
-
-# LABELED_SET = water_tr.merge(trees_tr).merge(grass_tr).merge(turf_tr).merge(impervious_tr).merge(soil_tr)
-
-# # Create the labeled feature collection set for test data
-# water_test = ee.FeatureCollection("projects/california-lawn-detection/assets/water_test")
-# vegetation_trees_test = ee.FeatureCollection("projects/california-lawn-detection/assets/trees_test")
-# vegetation_grass_test  = ee.FeatureCollection("projects/california-lawn-detection/assets/grass_test")
-# turf_test  = ee.FeatureCollection("projects/california-lawn-detection/assets/turf_test")
-# impervious_test  = ee.FeatureCollection("projects/california-lawn-detection/assets/impervious_reduced_test")
-# soil_test  = ee.FeatureCollection("projects/california-lawn-detection/assets/soil_reduced_070222")
-
-
-# TEST_SET = water_test.merge(vegetation_trees_test).merge(vegetation_grass_test).merge(turf_test).merge(impervious_test).merge(soil_test)
-
-# Generate training image
 training_image_params = {
         'source_image_collection' : 'USDA/NAIP/DOQQ',
         'years' : [2020],
@@ -114,37 +108,19 @@ training_image_params = {
 
 TRAINING_IMAGE = get_images(training_image_params)['2020_la_county']
 
-# # Separate into train and test data using feature collection sets
-# train_data = TRAINING_IMAGE.select(BANDS).sampleRegions(**{
-#   'collection': LABELED_SET,
-#   'properties': [LABEL],
-#   'scale': 1
-# })
 
-# test_data = TRAINING_IMAGE.select(BANDS).sampleRegions(**{
-#   'collection': TEST_SET,
-#   'properties': [LABEL],
-#   'scale': 1
-# })
-
-# # Train GEE RF model
-# clf = ee.Classifier.smileRandomForest(numberOfTrees = 230, minLeafPopulation = 50, bagFraction= 0.6)\
-#                    .train(train_data, LABEL, BANDS)
-
-# # Classify image using GEE RF model
-# training_image_classified = TRAINING_IMAGE.select(BANDS)\
-#                                           .classify(clf)
-
-# Point to the specific TF model to be used for inference
+# Point to the TF model(s) to be used for inference
 PROJECT = 'w210-351617'
-MODEL_NAME = 'CNN_Nbands_model'
 VERSION_NAME = 'v0'
+OLD_MODEL_NAME = 'CNN_Nbands_model'
+NEW_MODEL_NAME = 'CNN_Nbands_sep_cls_wlake_model'
+
 input_dim = [12,12]
 
-# Point to the model hosted on AI Platform.
-tf_model = ee.Model.fromAiPlatformPredictor(
+# Point to the old model hosted on AI Platform.
+old_tf_model = ee.Model.fromAiPlatformPredictor(
     projectName=PROJECT,
-    modelName=MODEL_NAME,
+    modelName=OLD_MODEL_NAME,
     version=VERSION_NAME,
     # Can be anything, but don't make it too big.
     inputTileSize=input_dim,
@@ -157,8 +133,37 @@ tf_model = ee.Model.fromAiPlatformPredictor(
     },
 )
 
-# Classify the training image using TF model
-training_image_classified = get_TF_classified_image(TRAINING_IMAGE, BANDS, tf_model, CLASSES)
-assert(training_image_classified.bandNames().getInfo() == ['classification'])
+# Point to the old model hosted on AI Platform.
+new_tf_model = ee.Model.fromAiPlatformPredictor(
+    projectName=PROJECT,
+    modelName=NEW_MODEL_NAME,
+    version=VERSION_NAME,
+    # Can be anything, but don't make it too big.
+    inputTileSize=input_dim,
+    # Note the names here need to match what was specified in the
+    # output dictionary passed to the EEifier originally
+    outputBands={'output': {
+        'type': ee.PixelType.float(),
+        'dimensions': 1
+      }
+    },
+)
 
+# Create model dictionaries
+model_dicts = [
+    {'model': old_tf_model, 'model_name': 'old_model', 'classes': OLD_CLASSES, 'image_name':'old_classification'},
+    {'model': new_tf_model, 'model_name': 'new_model', 'classes': NEW_CLASSES, 'image_name':'new_classification'},
+]
+
+# Classify the training image per model + ensembled
+classified_images = get_ensembled_classified_image(TRAINING_IMAGE, BANDS, model_dicts)
+
+# Remap the combined image so lakes are classified as pools together
+fromList = [0, 1, 2, 3, 4, 5, 6]
+toList = [0, 1, 2, 3, 4, 5, 0]
+
+training_image_classified = classified_images[-1].remap(fromList, toList)
+training_image_classified = training_image_classified.rename('classification')
+
+assert(training_image_classified.bandNames().getInfo() == ['classification'])
 

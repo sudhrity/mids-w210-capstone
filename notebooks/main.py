@@ -3,8 +3,7 @@ import uvicorn
 from pydantic import BaseModel
 
 #custom imports
-from areas import router1
-from areas import router2
+from areas import router1, router2
 
 
 app = FastAPI()

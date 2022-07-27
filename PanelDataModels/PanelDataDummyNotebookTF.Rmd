@@ -573,6 +573,10 @@ layout2 +
 
 data <- subset(data, subset = year > 2012)
 
+data$water_area <- data$water_area + 0.0000000001
+data$soil_area <- data$soil_area + 0.0000000001
+data$turf_area <- data$turf_area + 0.0000000001
+
 # Create panel dataframe object
 microClimatePanel <- pdata.frame(data, index=c("zipcode", "year"))
 
@@ -583,19 +587,20 @@ microClimatePanel <- pdata.frame(data, index=c("zipcode", "year"))
 ```{r, results='asis'}
 
 OLSM1 <- lm(
-  log(lst_day_mean) ~ 0 + factor(year) + polygon_area + tree_area + lawn_area + water_area + soil_area +
-    turf_area + grass_ndvi_mean + tree_ndvi_mean,
+  log(lst_day_mean) ~ 0 + factor(year) + tree_area + lawn_area + log(water_area) + log(soil_area) +
+    log(turf_area) + grass_ndvi_mean + tree_ndvi_mean,
   data = microClimatePanel)
 
 OLSM2 <- lm(
-  log(lst_night_mean) ~ 0 + factor(year) + polygon_area + tree_area + lawn_area + water_area + soil_area +
-    turf_area + grass_ndvi_mean + tree_ndvi_mean,
+  log(lst_night_mean) ~ 0 + factor(year) + tree_area + lawn_area + log(water_area) + log(soil_area) +
+    log(turf_area) + grass_ndvi_mean + tree_ndvi_mean,
   data = microClimatePanel)
 
 stargazer::stargazer(OLSM1,OLSM2, single.row = TRUE, 
                      title = 'OLS Model',
                      column.labels = c("OLSModel Day Temp",
                                        "OLSModel Night Temp"))
+
 ```
 
 # Second Attempt with a Mixed Effects Model
@@ -603,13 +608,13 @@ stargazer::stargazer(OLSM1,OLSM2, single.row = TRUE,
 ```{r, results='asis'}
 
 feM1 <- plm(
-  log(lst_day_mean) ~ 0 + factor(year) + tree_area + lawn_area + water_area + soil_area +
-    turf_area + grass_ndvi_mean + tree_ndvi_mean,
+  log(lst_day_mean) ~ 0 + factor(year) + tree_area + lawn_area + log(water_area) + log(soil_area) +
+    log(turf_area) + grass_ndvi_mean + tree_ndvi_mean,
   index = c(zipcode, year), data = microClimatePanel, model = 'within')
 
 feM2 <- plm(
-  log(lst_night_mean) ~ 0 + factor(year) + tree_area + lawn_area + water_area + soil_area +
-    turf_area + grass_ndvi_mean + tree_ndvi_mean,
+  log(lst_night_mean) ~ 0 + factor(year) + tree_area + lawn_area + log(water_area) + log(soil_area) +
+    log(turf_area) + grass_ndvi_mean + tree_ndvi_mean,
   index = c(zipcode, year), data = microClimatePanel, model = 'within')
 
 stargazer::stargazer(feM1,feM2, single.row = TRUE, 
@@ -635,13 +640,13 @@ pFtest(feM1, OLSM1)
 ```{r, results='asis'}
 
 reM1 <- plm(
-  log(lst_day_mean) ~ 0 + tree_area + lawn_area + water_area + soil_area +
-    turf_area + grass_ndvi_mean + tree_ndvi_mean,
+  log(lst_day_mean) ~ 0 + factor(year) + tree_area + lawn_area + log(water_area) + log(soil_area) +
+    log(turf_area) + grass_ndvi_mean + tree_ndvi_mean,
   index = c(zipcode, year), data = microClimatePanel, model = 'random')
 
 reM2 <- plm(
-  log(lst_night_mean) ~ 0 + tree_area + lawn_area + water_area + soil_area +
-    turf_area + grass_ndvi_mean + tree_ndvi_mean,
+  log(lst_night_mean) ~ 0 + factor(year) + tree_area + lawn_area + log(water_area) + log(soil_area) +
+    log(turf_area) + grass_ndvi_mean + tree_ndvi_mean,
   index = c(zipcode, year), data = microClimatePanel, model = 'random')
 
 stargazer::stargazer(reM1,reM2, 
@@ -649,7 +654,6 @@ stargazer::stargazer(reM1,reM2,
                      title = 'Random Effects Model', 
                      column.labels = c("RandomEffects Day Temp",
                                        "RandomEffects Night Temp"))
-
 
 ```
 
@@ -670,8 +674,8 @@ phtest(feM1, reM1)
 ```{r, results='asis'}
 
 feM2FixedTime <- plm(
-  log(lst_day_mean) ~ 0 + tree_area + lawn_area + water_area + soil_area +
-    turf_area + grass_ndvi_mean + tree_ndvi_mean,
+  log(lst_day_mean) ~ 0 + factor(year) + tree_area + lawn_area + log(water_area) + log(soil_area) +
+    log(turf_area) + grass_ndvi_mean + tree_ndvi_mean,
   index = c(zipcode, year), data = microClimatePanel, model = 'within')
 
 stargazer::stargazer(feM2FixedTime, single.row = TRUE)

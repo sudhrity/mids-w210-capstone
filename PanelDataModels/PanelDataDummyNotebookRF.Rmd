@@ -1,0 +1,729 @@
+---
+title: 'LawnProject Panel Data Analysis / Random Forest Data'
+author: 'LawnProject Team'
+geometry: margin=1in
+output:
+  pdf_document:
+    latex_engine: xelatex
+  html_document: default
+  toc: yes
+  number_sections: yes
+fontsize: 11pt
+header-includes:
+  - \usepackage{makecell}
+---
+
+Intro
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+rm(list = ls())
+
+library(dplyr)
+library(tidyverse)
+library(magrittr)
+library(ggplot2)
+library(plm)
+library(lattice)
+library(patchwork)
+library(lubridate)
+library(ExPanDaR)
+library(stats)
+library(car)
+library(xts)
+library(stargazer)
+library(data.table)
+library(GGally)
+library(knitr)
+library(kableExtra)
+library(tinytex)
+library(data.table)
+library(DBI)
+library(odbc)
+library(RODBC)
+library(sandwich)
+library(lmtest)
+
+con <- dbConnect(odbc(),
+                 Driver='Devart ODBC Driver for PostgreSQL',
+                 # ^ use on local Windows development environment
+                 # Driver='PostgreSQL',
+                 # ^ Use on shinyapps.io deployment
+                 Server='18.204.57.173',
+                 Port='5432',
+                 Database='postgres',
+                 Uid='postgres',
+                 Pwd='&j>n!_nL]k&wWdE>*TVds4P6')
+
+
+#Query is parametrized to line and start and end date
+query1 <- as.character('SELECT * FROM \"public\".\"panel_zipcode\"')
+
+dataA <- dbGetQuery(con, query1)
+
+dataA$zipCodeYear <- paste0(dataA$zipcode,"_",dataA$year)
+
+#Query is parametrized to line and start and end date
+query2 <- as.character('SELECT * FROM \"public\".\"panel_microclimate\"')
+
+dataB <- dbGetQuery(con, query2)
+
+dataB$zipCodeYear <- paste0(dataB$zipcode,"_",dataB$year)
+
+dataB <- dataB %>%
+  select(5:11)
+
+data <- left_join(dataA,dataB,by='zipCodeYear')
+
+# data <- subset(data, subset = year >= 2016)
+
+rm(dataA,dataB)
+
+data$zipCodeYear <- as.factor(data$zipCodeYear)
+
+data <- subset(data, subset = zipcode != 90802)
+
+data[,8:14] <- data[,8:14]/data$polygon_area
+
+plotThis <- function(data,type,variableA,variableB) {
+  
+  year <- 'year'
+  
+  if (type == 'scatter') {
+    
+    data%>%
+      ggplot(aes_string(x = variableA, y=variableB, color = year)) + 
+      geom_point(size = 0.1) + 
+      geom_smooth(method = 'lm') + 
+      theme(text = element_text(size = 8))
+    
+  } else if (type == 'boxplot') {
+    
+    data%>%
+      ggplot(aes_string(y=variableA, x = year, fill = year, color = year)) + 
+      geom_violin(alpha = 0.3) + 
+      geom_boxplot(alpha = 0)  + 
+      theme(text = element_text(size = 8))
+    
+  } else if (type == 'normality') {
+    
+    data%>%
+      ggplot(aes_string(sample = variableA)) + stat_qq() + stat_qq_line() + theme_bw() +
+      labs(y = paste0(variableA, 'Sample Quantiles'), x = 'Normal Theoretical Quantiles') + 
+      theme(text = element_text(size = 8))
+    
+  }
+  
+}
+
+data$vegetation <- data$lawn_area + data$tree_area
+
+data$impervious <- data$impervious_area + data$soil_area + data$turf_area
+
+#Eliminate observations with zero vegetation
+data <- subset(data, subset = vegetation > 0)
+
+#FILTER WEIRD YEARS
+# data <- subset(data, subset = year > 2012)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+plotLayoutA <- function(varName) {
+  
+  layout <- G / (A + B)
+  
+    layout +
+    plot_annotation(
+      # title = paste0(varName, " Class Land Coverage Statistics"),
+      # theme = theme(plot.title = element_text(size = 10, hjust = 0.3, face = "bold"))
+    )
+}
+
+plotLayoutB <- function(varName) {
+  
+  layout2 <- (D + E) / C 
+  
+  layout2 + 
+    plot_annotation(
+      caption = "Google Earth: Random Forest Model"
+    )
+  
+}
+
+```
+
+# Aggregate Vegetation Area (Trees + Lawn)
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+###VEGETATION AREA
+A <- plotThis(data,'scatter','vegetation','lst_night_mean')
+B <- plotThis(data,'scatter','vegetation','lst_day_mean')
+C <- plotThis(data,'boxplot','vegetation')
+D <- plotThis(data,'normality','vegetation')
+E <- plotThis(data,'normality','log(vegetation)')
+
+G <- ggplot(data = data, aes(x=vegetation)) + 
+  geom_histogram(color='#086f69',fill='#086f69', alpha = 0.2) +
+  labs(title = 'Vegetation') +
+  theme_bw() 
+
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+plotLayoutA('Vegetation')
+
+plotLayoutB('Vegetation')
+
+```
+
+# Aggregate Impervious Area (Soil + Turf + Impervious)
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+###IMPERVIOUS AREA
+A <- plotThis(data,'scatter','impervious','lst_night_mean')
+B <- plotThis(data,'scatter','impervious','lst_day_mean')
+C <- plotThis(data,'boxplot','impervious')
+D <- plotThis(data,'normality','impervious')
+E <- plotThis(data,'normality','log(impervious)')
+
+G <- ggplot(data = data, aes(x=impervious)) + 
+  geom_histogram(color='#7c807c',fill='#7c807c', alpha = 0.2) +
+  labs(title = 'Impervious') +
+  theme_bw() 
+
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+plotLayoutA('Impervious')
+
+plotLayoutB('Impervious')
+
+```
+
+# Impervious Area
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+###LAWN_AREA AREA
+A <- plotThis(data,'scatter','impervious_area','lst_night_mean')
+B <- plotThis(data,'scatter','impervious_area','lst_day_mean')
+C <- plotThis(data,'boxplot','impervious_area')
+D <- plotThis(data,'normality','impervious_area')
+E <- plotThis(data,'normality','log(impervious_area)')
+
+G <- ggplot(data = data, aes(x=log(impervious_area))) + 
+  geom_histogram(color='#7c807c',fill='#7c807c', alpha = 0.2) +
+  labs(title = 'impervious_area') +
+  theme_bw() 
+
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+plotLayoutA('Impervious Area')
+
+plotLayoutB('Impervious Area')
+
+```
+
+# Lawn Area
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+###LAWN_AREA AREA
+A <- plotThis(data,'scatter','lawn_area','lst_night_mean')
+B <- plotThis(data,'scatter','lawn_area','lst_day_mean')
+C <- plotThis(data,'boxplot','lawn_area')
+D <- plotThis(data,'normality','lawn_area')
+E <- plotThis(data,'normality','log(lawn_area)')
+
+G <- ggplot(data = data, aes(x=lawn_area)) + 
+  geom_histogram(color='#1dd12d',fill='#1dd12d', alpha = 0.2) +
+  labs(title = 'lawn_area') +
+  theme_bw() 
+
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+plotLayoutA('Lawn Area')
+
+plotLayoutB('Lawn Area')
+
+```
+
+# Tree Area
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+###TREE_AREA AREA
+A <- plotThis(data,'scatter','tree_area','lst_night_mean')
+B <- plotThis(data,'scatter','tree_area','lst_day_mean')
+C <- plotThis(data,'boxplot','tree_area')
+D <- plotThis(data,'normality','tree_area')
+E <- plotThis(data,'normality','log(tree_area)')
+
+G <- ggplot(data = data, aes(x=tree_area)) + 
+  geom_histogram(color='#086f69',fill='#086f69', alpha = 0.2) +
+  labs(title = 'tree_area') +
+  theme_bw() 
+
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+plotLayoutA('Tree Area')
+
+plotLayoutB('Tree Area')
+
+```
+
+# Water Area
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+###LAWN_AREA AREA
+A <- plotThis(data,'scatter','log(water_area)','lst_night_mean')
+B <- plotThis(data,'scatter','log(water_area)','lst_day_mean')
+C <- plotThis(data,'boxplot','log(water_area)')
+D <- plotThis(data,'normality','water_area')
+E <- plotThis(data,'normality','log(water_area)')
+
+G <- ggplot(data = data, aes(x=log(water_area))) + 
+  geom_histogram(color='#2252ff',fill='#2252ff', alpha = 0.2) +
+  labs(title = 'water_area') +
+  theme_bw() 
+
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+plotLayoutA('Water Area')
+
+plotLayoutB('Water Area')
+
+```
+
+# Soil Area
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+###LAWN_AREA AREA
+A <- plotThis(data,'scatter','soil_area','lst_night_mean')
+B <- plotThis(data,'scatter','soil_area','lst_day_mean')
+C <- plotThis(data,'boxplot','soil_area')
+D <- plotThis(data,'normality','soil_area')
+E <- plotThis(data,'normality','log(soil_area)')
+
+G <- ggplot(data = data, aes(x=log(soil_area))) + 
+  geom_histogram(color='#a47041',fill='#a47041', alpha = 0.2) +
+  labs(title = 'soil_area') +
+  theme_bw() 
+
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+plotLayoutA('Soil Area')
+
+plotLayoutB('Soil Area')
+
+```
+
+# Turf Area
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+###TURF_AREA AREA
+A <- plotThis(data,'scatter','log(turf_area)','lst_night_mean')
+B <- plotThis(data,'scatter','log(turf_area)','lst_day_mean')
+C <- plotThis(data,'boxplot','log(turf_area)')
+D <- plotThis(data,'normality','turf_area')
+E <- plotThis(data,'normality','log(turf_area)')
+
+G <- ggplot(data = data, aes(x=log(turf_area))) + 
+  geom_histogram(color='#0b9ed5',fill='#0b9ed5', alpha = 0.2) +
+  labs(title = 'turf_area') +
+  theme_bw() 
+
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+plotLayoutA('Turf Area')
+
+plotLayoutB('Turf Area')
+
+```
+
+# Tree NDVI Mean
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+###TURF_AREA AREA
+A <- plotThis(data,'scatter','tree_ndvi_mean','lst_night_mean')
+B <- plotThis(data,'scatter','tree_ndvi_mean','lst_day_mean')
+C <- plotThis(data,'boxplot','tree_ndvi_mean')
+D <- plotThis(data,'normality','tree_ndvi_mean')
+E <- plotThis(data,'normality','log(tree_ndvi_mean)')
+
+G <- ggplot(data = data, aes(x=log(tree_ndvi_mean))) + 
+  geom_histogram(color='#086f69',fill='#086f69', alpha = 0.2) +
+  labs(title = 'tree_ndvi_mean') +
+  theme_bw() 
+
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+plotLayoutA('Tree NDVI Mean')
+
+plotLayoutB('Tree NDVI Mean')
+
+```
+
+# Tree NDVI Min
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+###TURF_AREA AREA
+A <- plotThis(data,'scatter','tree_ndvi_min','lst_night_mean')
+B <- plotThis(data,'scatter','tree_ndvi_min','lst_day_mean')
+C <- plotThis(data,'boxplot','tree_ndvi_min')
+D <- plotThis(data,'normality','tree_ndvi_min')
+E <- plotThis(data,'normality','log(tree_ndvi_min)')
+
+G <- ggplot(data = data, aes(x=log(tree_ndvi_min))) + 
+  geom_histogram(color='#086f69',fill='#086f69', alpha = 0.2) +
+  labs(title = 'tree_ndvi_min') +
+  theme_bw() 
+
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+plotLayoutA('Tree NDVI Min')
+
+plotLayoutB('Tree NDVI Min')
+
+```
+
+# Tree NDVI Max
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+###TURF_AREA AREA
+A <- plotThis(data,'scatter','tree_ndvi_max','lst_night_mean')
+B <- plotThis(data,'scatter','tree_ndvi_max','lst_day_mean')
+C <- plotThis(data,'boxplot','tree_ndvi_max')
+D <- plotThis(data,'normality','tree_ndvi_max')
+E <- plotThis(data,'normality','log(tree_ndvi_max)')
+
+G <- ggplot(data = data, aes(x=log(tree_ndvi_max))) + 
+  geom_histogram(color='#086f69',fill='#086f69', alpha = 0.2) +
+  labs(title = 'tree_ndvi_max') +
+  theme_bw() 
+
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+plotLayoutA('Tree NDVI Max')
+
+plotLayoutB('Tree NDVI Max')
+
+```
+
+# Lawn NDVI Mean
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+###TURF_AREA AREA
+A <- plotThis(data,'scatter','grass_ndvi_mean','lst_night_mean')
+B <- plotThis(data,'scatter','grass_ndvi_mean','lst_day_mean')
+C <- plotThis(data,'boxplot','grass_ndvi_mean')
+D <- plotThis(data,'normality','grass_ndvi_mean')
+E <- plotThis(data,'normality','log(grass_ndvi_mean)')
+
+G <- ggplot(data = data, aes(x=log(grass_ndvi_mean))) + 
+  geom_histogram(color='#1dd12d',fill='#1dd12d', alpha = 0.2) +
+  labs(title = 'grass_ndvi_mean') +
+  theme_bw() 
+
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+plotLayoutA('Grass NDVI Mean')
+
+plotLayoutB('Grass NDVI Mean')
+
+```
+
+# Lawn NDVI Min
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+###TURF_AREA AREA
+A <- plotThis(data,'scatter','grass_ndvi_min','lst_night_mean')
+B <- plotThis(data,'scatter','grass_ndvi_min','lst_day_mean')
+C <- plotThis(data,'boxplot','grass_ndvi_min')
+D <- plotThis(data,'normality','grass_ndvi_min')
+E <- plotThis(data,'normality','log(grass_ndvi_min)')
+
+G <- ggplot(data = data, aes(x=log(grass_ndvi_min))) + 
+  geom_histogram(color='#1dd12d',fill='#1dd12d', alpha = 0.2) +
+  labs(title = 'grass_ndvi_min') +
+  theme_bw() 
+
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+plotLayoutA('Grass NDVI Min')
+
+plotLayoutB('Grass NDVI Min')
+
+```
+
+# Lawn NDVI Max
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+###TURF_AREA AREA
+A <- plotThis(data,'scatter','grass_ndvi_max','lst_night_mean')
+B <- plotThis(data,'scatter','grass_ndvi_max','lst_day_mean')
+C <- plotThis(data,'boxplot','grass_ndvi_max')
+D <- plotThis(data,'normality','grass_ndvi_max')
+E <- plotThis(data,'normality','log(grass_ndvi_max)')
+
+G <- ggplot(data = data, aes(x=log(grass_ndvi_max))) + 
+  geom_histogram(color='#1dd12d',fill='#1dd12d', alpha = 0.2) +
+  labs(title = 'grass_ndvi_max') +
+  theme_bw() 
+
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+plotLayoutA('Grass NDVI Max')
+
+plotLayoutB('Grass NDVI Max')
+
+```
+
+# Mean Temperature
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+###TURF_AREA AREA
+A <- plotThis(data,'scatter','lst_day_mean','lst_night_mean')
+
+B <- plotThis(data,'boxplot','lst_day_mean')
+C <- plotThis(data,'boxplot','lst_night_mean')
+
+D <- ggplot(data = data, aes(x=lst_day_mean)) + 
+  geom_histogram(color='orange',fill='orange', alpha = 0.2) +
+  labs(title = 'lst_day_mean') +
+  theme_bw() 
+
+E <- ggplot(data = data, aes(x=lst_night_mean)) + 
+  geom_histogram(color='darkblue',fill='darkblue', alpha = 0.2) +
+  labs(title = 'lst_night_mean') +
+  theme_bw() 
+
+layout1 <- A / (B + C)
+
+layout2 <- D / E
+
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+layout1
+
+layout2 + 
+    plot_annotation(
+      caption = "Google Earth: Random Forest Model"
+    )
+
+```
+
+# Create MicroClimate Panel Data Set
+
+```{r}
+
+data <- subset(data, subset = year > 2012)
+
+# Create panel dataframe object
+microClimatePanel <- pdata.frame(data, index=c("zipcode", "year"))
+
+```
+
+# First Attempt with Traditional OLS Model
+
+```{r, results='asis'}
+
+OLSM1 <- lm(
+  log(lst_day_mean) ~ 0 + factor(year) + tree_area + lawn_area + water_area + soil_area +
+    turf_area + grass_ndvi_mean + tree_ndvi_mean,
+  data = microClimatePanel)
+
+stargazer::stargazer(OLSM1, single.row = TRUE, title = 'OLS Model')
+
+```
+
+# Second Attempt with a Mixed Effects Model
+
+```{r, results='asis'}
+
+feM1 <- plm(
+  log(lst_day_mean) ~ 0 + factor(year) + tree_area + lawn_area + water_area + soil_area +
+    turf_area + grass_ndvi_mean + tree_ndvi_mean,
+  index = c(zipcode, year), data = microClimatePanel, model = 'within')
+
+stargazer::stargazer(feM1, single.row = TRUE, title = 'Fixed Effects Model')
+
+```
+
+# Compare Performance of OLS vs Mixed Effects Models
+
+```{r}
+
+pFtest(feM1, OLSM1) 
+## Fixed effects is a better choice than OLS
+
+```
+
+## Fixed Effects is a Better Choice, Discard OLS Model
+
+# Try a Random Effects Model
+
+```{r, results='asis'}
+
+reM1 <- plm(
+  log(lst_day_mean) ~ 0 + tree_area + lawn_area + water_area + soil_area +
+    turf_area + grass_ndvi_mean + tree_ndvi_mean,
+  index = c(zipcode, year), data = microClimatePanel, model = 'random')
+
+stargazer::stargazer(reM1, single.row = TRUE, title = 'Random Effects Model')
+
+```
+
+# Compare Performance of Mixed Effects vs Random Effects Models
+
+```{r}
+
+phtest(feM1, reM1)
+## the p-value is significant so we choose fixed effects
+## (since the unique errors are correlated with the regressors).
+
+```
+
+## the p-value is significant so we choose fixed effects (since the unique errors are correlated with the regressors). There is omitted variable bias at the higher level that the RE model has not accounted for (but the FE model has).
+
+# Try a Fixed Effects Model with Fixed Time
+
+```{r, results='asis'}
+
+feM2FixedTime <- plm(
+  log(lst_day_mean) ~ 0 + tree_area + lawn_area + water_area + soil_area +
+    turf_area + grass_ndvi_mean + tree_ndvi_mean,
+  index = c(zipcode, year), data = microClimatePanel, model = 'within')
+
+stargazer::stargazer(feM2FixedTime, single.row = TRUE)
+
+```
+
+```{r}
+
+pFtest(feM1,feM2FixedTime)
+
+```
+
+```{r}
+
+plmtest(feM1, effect="time", type="bp")
+
+```
+
+```{r}
+pbgtest(feM1)
+
+```
+
+```{r}
+
+coeftest(feM1, vcovHC) 
+
+```
+
+```{r}
+
+coeftest(feM1, vcovHC(feM1, method = "arellano")) 
+t(sapply(c("HC0", "HC1", "HC2", "HC3", "HC4"), function(x) sqrt(diag(vcovHC(feM1, method = "arellano", type = x)))))
+
+```
+
+```{r}
+
+totalRobust <- coeftest(feM1, vcov = vcovHC(feM1, type = 'HC0'))
+cInterval <- coefci(feM1, vcov. = vcovHC(feM1, type = 'HC0'))
+
+```
+
+```{r}
+
+print(totalRobust)
+
+```
+
+```{r}
+
+print(cInterval)
+
+```
+
+```{r, results='asis'}
+
+stargazer::stargazer(OLSM1,feM1,reM1,feM2FixedTime, 
+                     font.size = 'tiny',
+                     title = 'Regression Models Sumamry',
+                     column.labels = c("OLS", "FixedEffects",
+                                       "RandomEffects",
+                                       "FixedEffectsFixedTime"))
+
+```
+
+```{r}
+
+qqnorm(residuals(feM1), ylab = 'Residuals')
+qqline(residuals(feM1))
+
+```
+
+```{r}
+
+hist(residuals(feM1), xlab = 'Residuals')
+
+```
+
+

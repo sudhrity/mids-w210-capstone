@@ -608,12 +608,12 @@ stargazer::stargazer(OLSM1,OLSM2, single.row = TRUE,
 ```{r, results='asis'}
 
 feM1 <- plm(
-  log(lst_day_mean) ~ 0 + factor(year) + tree_area + lawn_area + log(water_area) + log(soil_area) +
+  lst_day_mean ~ 0 + factor(year) + tree_area + lawn_area + log(water_area) + log(soil_area) +
     log(turf_area) + grass_ndvi_mean + tree_ndvi_mean,
   index = c(zipcode, year), data = microClimatePanel, model = 'within')
 
 feM2 <- plm(
-  log(lst_night_mean) ~ 0 + factor(year) + tree_area + lawn_area + log(water_area) + log(soil_area) +
+  lst_night_mean ~ 0 + factor(year) + tree_area + lawn_area + log(water_area) + log(soil_area) +
     log(turf_area) + grass_ndvi_mean + tree_ndvi_mean,
   index = c(zipcode, year), data = microClimatePanel, model = 'within')
 

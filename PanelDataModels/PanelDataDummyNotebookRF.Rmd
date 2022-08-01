@@ -734,6 +734,25 @@ print(cInterval)
 
 ```
 
+```{r}
+
+totalRobust <- coeftest(feM2, vcov = vcovHC(feM1, type = 'HC0'))
+cInterval <- coefci(feM2, vcov. = vcovHC(feM1, type = 'HC0'))
+
+```
+
+```{r}
+
+print(totalRobust)
+
+```
+
+```{r}
+
+print(cInterval)
+
+```
+
 ```{r, results='asis'}
 
 stargazer::stargazer(OLSM1,feM1,reM1,feM2FixedTime, 

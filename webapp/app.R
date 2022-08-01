@@ -14,17 +14,18 @@ library(dashboardthemes)
 library(shinyWidgets)
 library(tidyr)
 library(dplyr)
-library(ggborderline)
 library(sandwich)
 library(lmtest)
+library(stringr)
+library(shinyscreenshot)
 source("about.R")
 
 con <- dbConnect(odbc(),
-                 Driver='Devart ODBC Driver for PostgreSQL',
+                 # Driver='Devart ODBC Driver for PostgreSQL',
                  # ^ use on local Windows development environment
-                 # Driver='PostgreSQL',
+                 Driver='PostgreSQL',
                  # ^ Use on shinyapps.io deployment
-                 Server='3.239.228.42',
+                 Server='18.204.57.173',
                  Port='5432',
                  Database='postgres',
                  Uid='postgres',
@@ -39,7 +40,7 @@ features <- c('polygon_area','water_area','lawn_area','tree_area','pv_area',
 climateFeature <- c("lst_day_mean","lst_day_max","lst_day_min","lst_night_mean", 
                     "lst_night_max","lst_night_min")
 
-# options(shiny.reactlog = TRUE)
+options(shiny.reactlog = TRUE)
 
 api_key <- "AIzaSyCBjR3FHdXlv8gCetNC5j1D507UzC6Y_dM"
 
@@ -56,15 +57,16 @@ cityList <- cityList[City != ""]
 
 freehand <- 'Please draw polygon on map'
 
+estimatesData <- fread('Estimates.csv')
+
 ui <- dashboardPage(
   
-  dashboardHeader(title = "CityAnalytics"),
+  dashboardHeader(title = "UrbanInsights"),
   
-  dashboardSidebar(width = 300,
+  dashboardSidebar(width = 0,
                    collapsed = TRUE
-                   
-                   
   ),
+  
   dashboardBody(
     
     shinyDashboardThemes(
@@ -116,113 +118,185 @@ ui <- dashboardPage(
                
       ),
       
-      tabPanel("Custom Polygon Prediction", 
+      tabPanel("Custom Polygon", 
                
                fluidRow(
                  
-                 box(width = 2,
-                     
-                     valueBoxOutput("info_box1b", width = 12),
-                     hr(),
-                     valueBoxOutput("info_box2b", width = 12),
-                     hr(),
-                     valueBoxOutput("info_box3b", width = 12),
-                     hr(),
-                     valueBoxOutput("info_box4b", width = 12),
-                     hr(),
-                     valueBoxOutput("info_box5b", width = 12),
-                     hr(),
-                     valueBoxOutput("info_box6b", width = 12),
-                     hr(),
-                     valueBoxOutput("info_box7b", width = 12),
-                     
+                 HTML("<h3>&nbsp&nbsp&nbsp&nbspCustom Polygon Land Coverage</h3>"),
+                 
+                 column(width = 12,
+                        
+                        box(width = 2,
+                            
+                            valueBoxOutput("info_box1b", width = 12),
+                            hr(),
+                            valueBoxOutput("info_box2b", width = 12),
+                            hr(),
+                            valueBoxOutput("info_box3b", width = 12),
+                            hr(),
+                            valueBoxOutput("info_box4b", width = 12),
+                            hr(),
+                            valueBoxOutput("info_box5b", width = 12),
+                            hr(),
+                            valueBoxOutput("info_box6b", width = 12),
+                            hr(),
+                            valueBoxOutput("info_box7b", width = 12),
+                            
+                        ),
+                        
+                        box(width = 2,
+                            
+                            valueBoxOutput("info_box2a", width = 12),
+                            
+                            box(width = 12,
+                                
+                                div(style="height: 78px;",
+                                    numericInput("slider1a", h6("Change lawn area (+/- %)"),
+                                                 min = -100, max = 500, value = 0,
+                                                 step = 1)),
+                            ),
+                            
+                            box(width = 12,
+                                
+                                div(style="height: 78px;",
+                                    numericInput("slider2a", h6("Change tree area"),
+                                                 min = -100, max = 200, value = 0,
+                                                 step = 1)),
+                            ),
+                            
+                            box(width = 12,
+                                
+                                div(style="height: 78px;",
+                                    numericInput("slider3a", h6("Change impervious area"),
+                                                 min = -100, max = 200, value = 0,
+                                                 step = 1)),
+                            ),
+                            
+                            box(width = 12,
+                                
+                                div(style="height: 78px;",
+                                    numericInput("slider4a", h6("Change water area"),
+                                                 min = -100, max = 200, value = 0,
+                                                 step = 1)),
+                                
+                            ),
+                            
+                            box(width = 12,
+                                
+                                div(style="height: 78px;",
+                                    numericInput("slider5a", h6("Change soil area"),
+                                                 min = -100, max = 200, value = 0,
+                                                 step = 1)),
+                            ),
+                            
+                            box(width = 12,
+                                
+                                div(style="height: 78px;",
+                                    numericInput("slider6a", h6("Change turf area"),
+                                                 min = -100, max = 200, value = 0,
+                                                 step = 1)),
+                                
+                                
+                            ),
+                            
+                        ),
+                        
+                        box(width = 8,
+                            
+                            column(width = 6,
+                                   textInput("address", label = "Please type in a reference address: "),
+                                   value = '900 Wilshire Blvd, Los Angeles, CA 90017, United States'),
+                            
+                            column(width = 2,
+                                   actionButton("submitAddress", label = "Submit Address")),
+                            
+                            column(width = 2,
+                                   
+                                   selectInput('metric', h5("Select units for area"),
+                                               choices = c('meters','kilometers'),
+                                               selected = 'meters',
+                                               multiple = FALSE),
+                                   
+                            ),
+                            
+                            column(width = 2,
+                                   
+                                   actionButton("go", "Take a screenshot")
+                                   
+                            ),
+                            
+                            box(width = 12,
+                                
+                                column(width = 12,
+                                       google_mapOutput(outputId = "myMap", height = 720)
+                                ),
+                                
+                                # column(width = 6,
+                                #        plotOutput(outputId = "inferencePlot")
+                                # ),
+                                
+                            ),
+                        ),
+                        
                  ),
                  
-                 box(width = 2,
-                     
-                     valueBoxOutput("info_box2a", width = 12),
-                     
-                     box(width = 12,
-                         
-                         div(style="height: 78px;",
-                             sliderInput("slider1a", h6("Change lawn area"),
-                                         min = -100, max = 100, value = 0,
-                                         step = 1)),
-                     ),
-                     
-                     box(width = 12,
-                         
-                         div(style="height: 78px;",
-                             sliderInput("slider2a", h6("Change tree area"),
-                                         min = -100, max = 100, value = 0,
-                                         step = 1)),
-                     ),
-                     
-                     box(width = 12,
-                         
-                         div(style="height: 78px;",
-                             sliderInput("slider3a", h6("Change impervious area"),
-                                         min = -100, max = 100, value = 0,
-                                         step = 1)),
-                     ),
-                     
-                     box(width = 12,
-                         
-                         div(style="height: 78px;",
-                             sliderInput("slider4a", h6("Change water area"),
-                                         min = -100, max = 100, value = 0,
-                                         step = 1)),
-                         
-                     ),
-                     
-                     box(width = 12,
-                         
-                         div(style="height: 78px;",
-                             sliderInput("slider5a", h6("Change soil area"),
-                                         min = -100, max = 100, value = 0,
-                                         step = 1)),
-                     ),
-                     
-                     box(width = 12,
-                         
-                         div(style="height: 78px;",
-                             sliderInput("slider6a", h6("Change turf area"),
-                                         min = -100, max = 100, value = 0,
-                                         step = 1)),
-                         
-                         
-                     ),
-                     
-                 ),
+                 HTML("<h3>&nbsp&nbsp&nbsp&nbspWater & Microclimate Insights</h3>"),
                  
-                 box(width = 8,
-                     
-                     box(width = 8,
-                         textInput("address", label = "Please type in a reference address: "),
-                         value = '900 Wilshire Blvd, Los Angeles, CA 90017, United States'),
-                     
-                     box(width = 4,
-                         actionButton("submitAddress", label = "Submit Address")),
-                     
-                     box(width = 6,
-                         google_mapOutput(outputId = "myMap", height = 620)
-                     ),
-                     
-                     box(width = 6,
-                         plotlyOutput(outputId = "inferencePlot", height = 620)
-                     )
-                     
-                     
-                 )
+                 column(width = 12,
+                        
+                        box(width = 6,
+                            
+                            h3("Microclimate Impact Analysis"),
+                            
+                            hr(),
+                            
+                            column(width = 8,
+                                   
+                                   selectInput('inferenceModel', h5("Select which model data to use for estimates:"),
+                                               choices = c('Random Forest Model','TensorFlow Model'),
+                                               selected = 'Random Forest Model',
+                                               multiple = FALSE),
+                                   
+                            ),
+                            
+                            column(width = 12,
+                                   
+                                   valueBoxOutput("MCinfoBox1", width = 6),
+                                   valueBoxOutput("MCinfoBox2", width = 6),
+                                   
+                                   column(width = 6,
+                                          
+                                          htmlOutput("microClimateOutputs")
+                                          
+                                   ),
+                                   
+                                   column(width = 6,
+                                          
+                                          plotlyOutput('MCPlot')
+                                          
+                                   ),
+                            ),
+                            
+                        ),
+                        
+                        box(width = 6,
+                            
+                            h3("Water Impact Analysis"),
+                            
+                            plotlyOutput('testPlot2', height = 500), 
+                            
+                        ),
+                 ),
                  
                ),
+               
       ),
       
-      tabPanel("Predefined Polygon Prediction", 
+      tabPanel("Predefined Polygon", 
                
                fluidRow(
                  
-                 HTML("<h3>&nbsp&nbsp&nbsp&nbspPredefined Polygon Model Outputs</h3>"),
+                 HTML("<h3>&nbsp&nbsp&nbsp&nbspPredefined Polygon Panel Data Analysis</h3>"),
                  
                  column(width = 12,
                         
@@ -250,6 +324,12 @@ ui <- dashboardPage(
                                
                         ),
                         
+                        column(width = 2,
+                               
+                               actionButton("go2", "Take a screenshot")
+                               
+                        ),
+                        
                  ),
                  
                  column(
@@ -272,117 +352,136 @@ ui <- dashboardPage(
                    
                  ),
                  
-                 column(
-                   width = 12,
+                 tabsetPanel(
                    
-                   column(6,
-                          
-                          plotlyOutput('affluencyCorrPlot', height = 500), 
-                          
+                   tabPanel("Basic Insights",
+                            
                    ),
                    
-                   column(6,
-                          
-                          plotlyOutput('climateCorrPlot', height = 500), 
-                          
-                   ),
+                   tabPanel("Advanced Insights (Regression Panel)",
+                            
+                            br(),
+                            
+                            column(
+                              width = 12,
+                              
+                              column(6,
+                                     
+                                     plotlyOutput('affluencyCorrPlot', height = 500), 
+                                     
+                              ),
+                              
+                              column(6,
+                                     
+                                     plotlyOutput('climateCorrPlot', height = 500), 
+                                     
+                              ),
+                              
+                              column(1,
+                                     
+                                     selectInput("affluencyXAxis", h5("Select an x axis feature"),
+                                                 choices = features,
+                                                 selected = 'tree_area',
+                                                 multiple = FALSE),
+                              ),
+                              
+                              column(1,
+                                     
+                                     h6("Apply transformation to x axis?"),
+                                     checkboxInput("affluencyXTransf", "Log", 
+                                                   value = TRUE),
+                                     
+                              ),
+                              
+                              column(1,
+                                     
+                                     selectInput("affluencyYAxis", h5("Select an y axis feature"),
+                                                 choices = 'median_hh_income',
+                                                 selected = 'median_hh_income',
+                                                 multiple = FALSE),
+                              ),
+                              
+                              column(1,
+                                     
+                                     h6("Apply transformation to y axis?"),
+                                     checkboxInput("affluencyYTransf", "Log", 
+                                                   value = TRUE),
+                                     
+                              ),
+                              
+                              column(2,
+                                     
+                              ),
+                              
+                              column(1,
+                                     
+                                     selectInput("climateXAxis", h5("Select an x axis feature"),
+                                                 choices = features,
+                                                 selected = 'tree_area',
+                                                 multiple = FALSE),
+                                     
+                              ),
+                              
+                              column(1,
+                                     
+                                     h6("Apply transformation to x axis?"),
+                                     checkboxInput("climateXTransf", "Log", 
+                                                   value = TRUE),
+                                     
+                              ),
+                              
+                              column(1,
+                                     
+                                     selectInput("climateYAxis", h5("Select an y axis feature"),
+                                                 choices = climateFeature,
+                                                 selected = 'lst_day_mean',
+                                                 multiple = FALSE),
+                                     
+                              ),
+                              
+                              column(1,
+                                     
+                                     h6("Apply transformation to y axis?"),
+                                     checkboxInput("climateYTransf", "Log", 
+                                                   value = TRUE),
+                                     
+                              ),
+                              
+                              column(2,
+                                     
+                              ),
+                              
+                              column(12,
+                                     
+                                     column(6,
+                                            
+                                            verbatimTextOutput('affluencyRegression'),
+                                            
+                                     ),
+                                     
+                                     column(6,
+                                            
+                                            verbatimTextOutput('climateRegression'),
+                                            
+                                     ),
+                              ),
+                              
+                              hr(),
+                              hr(),
+                              hr(),
+                              
+                            )
+                            
+                   )
                    
-                   column(1,
-                          
-                          selectInput("affluencyXAxis", h5("Select an x axis feature"),
-                                      choices = features,
-                                      selected = 'tree_area',
-                                      multiple = FALSE),
-                   ),
                    
-                   column(1,
-                          
-                          h6("Apply transformation to x axis?"),
-                          checkboxInput("affluencyXTransf", "Log", 
-                                        value = TRUE),
-                          
-                   ),
-                   
-                   column(1,
-                          
-                          selectInput("affluencyYAxis", h5("Select an y axis feature"),
-                                      choices = 'median_hh_income',
-                                      selected = 'median_hh_income',
-                                      multiple = FALSE),
-                   ),
-                   
-                   column(1,
-                          
-                          h6("Apply transformation to y axis?"),
-                          checkboxInput("affluencyYTransf", "Log", 
-                                        value = TRUE),
-                          
-                   ),
-                   
-                   column(2,
-                          
-                   ),
-                   
-                   column(1,
-                          
-                          selectInput("climateXAxis", h5("Select an x axis feature"),
-                                      choices = features,
-                                      selected = 'tree_area',
-                                      multiple = FALSE),
-                          
-                   ),
-                   
-                   column(1,
-                          
-                          h6("Apply transformation to x axis?"),
-                          checkboxInput("climateXTransf", "Log", 
-                                        value = TRUE),
-                          
-                   ),
-                   
-                   column(1,
-                          
-                          selectInput("climateYAxis", h5("Select an y axis feature"),
-                                      choices = climateFeature,
-                                      selected = 'lst_day_mean',
-                                      multiple = FALSE),
-                          
-                   ),
-                   
-                   column(1,
-                          
-                          h6("Apply transformation to y axis?"),
-                          checkboxInput("climateYTransf", "Log", 
-                                        value = TRUE),
-                          
-                   ),
-                   
-                   column(2,
-                          
-                   ),
-                   
-                   column(12,
-                          
-                          column(6,
-                                 
-                                 verbatimTextOutput('affluencyRegression'),
-                                 
-                                 hr(),
-                                 hr(),
-                                 hr(),
-                                 
-                          ),
-                          
-                   ),
                  ),
                  
                ),
                
       ),
       
-      tabPanel("Hot to Use CityAnalytics", 
-               
-               tableOutput("table")
+      tabPanel("How to Use UrbanInsights", 
                
       )
     )
@@ -396,6 +495,98 @@ mapLocation <- reactiveValues(a=c('34.1','-118.2'))
 ################################################################################
 
 server <- function(input, output, session) {
+  
+  observeEvent(input$go, {
+    
+    screenshot(
+      selector = "section.content",
+      filename = paste0('UrbanInsightsCustomPoly',Sys.Date()),
+      scale = 1,
+      timer = 0,
+      download = TRUE
+    )
+    
+  })
+  
+  observeEvent(input$go2, {
+    
+    screenshot(
+      selector = "section.content",
+      filename = paste0('UrbanInsightsPanelAnalysis',Sys.Date()),
+      scale = 1,
+      timer = 0,
+      download = TRUE
+    )
+    
+  })
+  
+  # cancel.onSessionEnded <- session$onSessionEnded(function() {
+  #   
+  #   dbDisconnect(con)
+  #   
+  # })
+  
+  output$testPlot1 <- renderPlotly({
+    
+    # data <- customPolygonAreas()
+    # 
+    # polygonArea <- data[[1]]
+    # 
+    # lawnArea <- input$slider1a
+    # 
+    # areaRatio <- round(data[[14]],1)
+    # 
+    # if (polygonArea > 0 & lawnArea == -100 & areaRatio >= 0.99) {
+    #   
+    #   waterData <- fread('C:/Users/crort/OneDrive/Desktop/CapstoneProject/waterData.csv')
+    #   
+    #   waterData$label <- factor(waterData$label,
+    #                          levels = c('waterUsageBefore','waterUsageAfter'),
+    #                          ordered = TRUE)
+    #   
+    #   ggplot(data = waterData, aes(x=label,y=value, fill = waterData$color, alpha = 0.5)) + 
+    #     geom_boxplot() +
+    #     scale_fill_manual(values=c("#1045b6", "#66ccff")) + 
+    #     labs(
+    #       title = 'Land conversion expected water usage change',
+    #       x='category',
+    #       y='average water usage gallons per sq foot per day'
+    #     )  +
+    #     theme_bw() +
+    #     theme(legend.position="none") 
+    #   
+    # }
+    
+  })
+  
+  output$testPlot2 <- renderPlotly({
+    
+    # data <- customPolygonAreas()
+    # 
+    # polygonArea <- data[[1]]
+    # 
+    # lawnArea <- input$slider1a
+    # 
+    # areaRatio <- round(data[[14]],1)
+    # 
+    # if (polygonArea > 0 & lawnArea == -100 & areaRatio >= 0.99) {
+    #   
+    #   weatherData <- fread('C:/Users/crort/OneDrive/Desktop/CapstoneProject/weatherData.csv')
+    #   
+    #   ggplot(data = weatherData, aes(x=label,y=value, fill = weatherData$color, alpha = 0.5)) + 
+    #     geom_boxplot() +
+    #     scale_fill_manual(values=c("#FDB813", "#131862")) + 
+    #     labs(
+    #       title = 'Land conversion expected temperature change',
+    #       x='category',
+    #       y='mean temperature May/June/July in Celsius'
+    #     )  +
+    #     theme_bw() +
+    #     theme(legend.position="none") 
+    #   
+    # }
+    
+  })
   
   output$myMap <- renderGoogle_map({
     
@@ -452,6 +643,8 @@ server <- function(input, output, session) {
     
     data <- dbGetQuery(con, query)
     
+    return(data)
+    
   })
   
   output$landCoveragePlot <- renderPlotly({
@@ -472,7 +665,7 @@ server <- function(input, output, session) {
       data$value <- as.numeric(data$value)
       
       maxArea <- max(data$value)
-      
+      3
       data$value <- data$value/maxArea
       
       data <-
@@ -596,11 +789,12 @@ server <- function(input, output, session) {
                    aes_string(x=xAxis,y=median_hh_income, value = zipcode)) +
         geom_point(data = dataSub, aes_string(x=xAxis,y=median_hh_income,
                                               color = zipcode),
-                   size=3) +
+                   size=4) +
         theme_bw() +
         theme(plot.background = element_rect(fill = "#F0F0F0")) +
         theme(legend.position='none') +
-        labs(title = 'Land Coverage vs Median Household Income',
+        labs(title = paste0(str_to_title(xAxis),' vs Median Household Income for Year ',
+                            input$slider1),
              x = xAxis,
              y = yAxisLabel)
       
@@ -616,45 +810,45 @@ server <- function(input, output, session) {
   output$affluencyRegression <- renderPrint({
     
     tryCatch({
-    
-    data <- affluencyPlotData()
-    
-    xAxis <- as.character(input$affluencyXAxis)
-    
-    median_hh_income <- 'median_hh_income'
-    
-    if (input$affluencyXTransf == TRUE) {
       
-      data <- subset(data, subset = xAxis > 1)
+      data <- affluencyPlotData()
       
-      data[[xAxis]] <- log(data[[xAxis]])
+      xAxis <- as.character(input$affluencyXAxis)
       
-    }
-    
-    if (input$affluencyYTransf == TRUE) {
+      median_hh_income <- 'median_hh_income'
       
-      data <- subset(data, subset = median_hh_income > 1)
+      if (input$affluencyXTransf == TRUE) {
+        
+        data <- subset(data, subset = xAxis > 1)
+        
+        data[[xAxis]] <- log(data[[xAxis]])
+        
+      }
       
-      data[[median_hh_income]] <- log(data[[median_hh_income]])
+      if (input$affluencyYTransf == TRUE) {
+        
+        data <- subset(data, subset = median_hh_income > 1)
+        
+        data[[median_hh_income]] <- log(data[[median_hh_income]])
+        
+      } 
       
-    } 
-    
-    data <- data[rowSums(sapply(data[-ncol(data)], is.infinite)) == 0, ]
-    
-    data <- na.omit(data)
-    
-    modelFormula <- paste0(median_hh_income,"~",xAxis)
-    
-    model <- lm(as.formula(modelFormula), data = data)
-    
-    totalRobust <- coeftest(model, vcov = vcovHC(model, type = 'HC3'))
-    
-    cInterval <- coefci(model, vcov. = vcovHC(model, type = 'HC3'))
-    
-    print(totalRobust)
-    
-    print(cInterval)
-    
+      data <- data[rowSums(sapply(data[-ncol(data)], is.infinite)) == 0, ]
+      
+      data <- na.omit(data)
+      
+      modelFormula <- paste0(median_hh_income,"~",xAxis)
+      
+      model <- lm(as.formula(modelFormula), data = data)
+      
+      totalRobust <- coeftest(model, vcov = vcovHC(model, type = 'HC3'))
+      
+      cInterval <- coefci(model, vcov. = vcovHC(model, type = 'HC3'))
+      
+      print(totalRobust)
+      
+      print(cInterval)
+      
     }, error = function(e) {
       
       print('No values to make regression with')
@@ -663,41 +857,53 @@ server <- function(input, output, session) {
     
   })
   
+  climateCorrData <- reactive({
+    
+    data <- panelData()
+    
+    data <- subset(data, subset = year == input$slider1)
+    
+    data[,8:14] <- data[,8:14]/data$polygon_area
+    
+    queryD <- as.character('SELECT * FROM \"public\".\"panel_microclimate\"') 
+    
+    climateData <- dbGetQuery(con, queryD)
+    
+    climateData <- subset(climateData, subset = year == input$slider1)
+    
+    climateFeature <- input$climateYAxis
+    
+    climateData <- climateData %>%
+      select(zipcode,climateFeature)
+    
+    names(climateData)[2] <- 'yAxis'
+    
+    climateData <- na.omit(climateData)
+    
+    data <- left_join(data,climateData, by='zipcode')
+    
+    rm(climateData)
+    
+    selectFeature <- as.character(input$climateXAxis)
+    
+    data <- data %>%
+      select(zipcode,selectFeature,yAxis)
+    
+    return(data)
+    
+  })
+  
   output$climateCorrPlot <- renderPlotly({
     
     tryCatch({
       
-      data <- panelData()
-      
-      data <- subset(data, subset = year == input$slider1)
-      
-      data[,8:14] <- data[,8:14]/data$polygon_area
-      
-      queryD <- as.character('SELECT * FROM \"public\".\"panel_microclimate\"') 
-      
-      climateData <- dbGetQuery(con, queryD)
-      
-      climateData <- subset(climateData, subset = year == input$slider1)
+      data <- climateCorrData()
       
       climateFeature <- input$climateYAxis
       
-      climateData <- climateData %>%
-        select(zipcode,climateFeature)
-      
-      names(climateData)[2] <- 'dependentVariableB'
-      
-      climateData <- na.omit(climateData)
-      
-      data <- left_join(data,climateData, by='zipcode')
-      
-      rm(climateData)
-      
       selectFeature <- as.character(input$climateXAxis)
       
-      data <- data %>%
-        select(zipcode,selectFeature,dependentVariableB)
-      
-      dependentVariableB <- 'dependentVariableB'
+      yAxis <- 'yAxis'
       zipcode <- 'zipcode'
       
       if (input$climateXTransf == TRUE) {
@@ -708,7 +914,7 @@ server <- function(input, output, session) {
       
       if (input$climateYTransf == TRUE) {
         
-        data[[dependentVariableB]] <- log(data[[dependentVariableB]])
+        data[[yAxis]] <- log(data[[yAxis]])
         
       }
       
@@ -716,17 +922,22 @@ server <- function(input, output, session) {
       
       dataSub <- subset(data, subset = zipcode %in% input$specifyPolygon)
       
-      ggplot(data = data, aes_string(x=selectFeature,y=dependentVariableB)) + 
+      ggplot(data = data, aes_string(x=selectFeature,y=yAxis)) + 
         geom_point(size = .1, color = 'white') + 
         geom_smooth(method = 'lm') + 
         geom_point(data=data, size = 2, color = pointColor,
-                   aes_string(x=selectFeature,y=dependentVariableB, value = zipcode)) +
-        geom_point(data = dataSub, aes_string(x=selectFeature,y=dependentVariableB,
+                   aes_string(x=selectFeature,y=yAxis, value = zipcode)) +
+        geom_point(data = dataSub, aes_string(x=selectFeature,y=yAxis,
                                               color = zipcode),
-                   size=3) +
+                   size=4) +
         theme_bw() +
         theme(plot.background = element_rect(fill = "#F0F0F0")) +
-        theme(legend.position='none')
+        theme(legend.position='none') +
+        labs(title = paste0(str_to_title(selectFeature),' vs ',
+                            str_to_title(climateFeature),' for Year ',
+                            input$slider1),
+             x = selectFeature,
+             y = climateFeature) 
       
     }, error = function(e) {
       
@@ -737,23 +948,75 @@ server <- function(input, output, session) {
     
   })
   
+  output$climateRegression <- renderPrint({
+    
+    tryCatch({
+      
+      data <- climateCorrData()
+      
+      climateFeature <- input$climateYAxis
+      
+      selectFeature <- as.character(input$climateXAxis)
+      
+      names(data)[3] <- as.character(climateFeature)
+      
+      if (input$climateXTransf == TRUE) {
+        
+        data <- subset(data, subset = selectFeature > 1)
+        
+        data[[selectFeature]] <- log(data[[selectFeature]])
+        
+      }
+      
+      if (input$climateYTransf == TRUE) {
+        
+        data <- subset(data, subset = climateFeature > 1)
+        
+        data[[climateFeature]] <- log(data[[climateFeature]])
+        
+      } 
+      
+      data <- data[rowSums(sapply(data[-ncol(data)], is.infinite)) == 0, ]
+      
+      data <- na.omit(data)
+      
+      modelFormula <- paste0(climateFeature,"~",selectFeature)
+      
+      model <- lm(as.formula(modelFormula), data = data)
+      
+      totalRobust <- coeftest(model, vcov = vcovHC(model, type = 'HC3'))
+      
+      cInterval <- coefci(model, vcov. = vcovHC(model, type = 'HC3'))
+      
+      print(totalRobust)
+      
+      print(cInterval)
+      
+    }, error = function(e) {
+      
+      print('No values to make regression with')
+      
+    })
+    
+  })
+  
   #Creates the query string by pasting together the request URL, and the 
   #User defined JSON polygon coordinates
   query <- reactive({
     
-    FastAPIlink <- 'http://3.239.228.42:5000/predict_polygon'
+    FastAPIlink <- 'http://18.204.57.173:5000/predict_polygon'
     
     FastAPIobject <- (input$myMap_polygoncomplete)
     
     FastAPIobject=toJSON(FastAPIobject,pretty=TRUE,auto_unbox=TRUE)
     
-    FastAPIobject <- gsub('Ld','Md',FastAPIobject)
+    FastAPIobject <- gsub(substr(FastAPIobject,20,21),"Md",FastAPIobject)
+    
+    print(FastAPIobject)
     
     FastAPIobject <- as.character(FastAPIobject)
     
     request <- paste0(FastAPIlink,"/",FastAPIobject)
-    
-    print(request)
     
     request
     
@@ -772,8 +1035,6 @@ server <- function(input, output, session) {
       
       if (substr(query,1,4) == 'http') {
         
-        print(query)
-        
         btc <- jsonlite::fromJSON(query)
         
       }
@@ -784,476 +1045,1125 @@ server <- function(input, output, session) {
     
   })
   
-  output$info_box1 <- renderValueBox({
+  infoBoxData <- reactive({
     
     data <- panelData()
     
-    if (is.null(data)) {
-      
-      (tags$p(NULL, 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
-        valueBox(
-          subtitle = tags$p("Polygon Area (km^2)", 
-                            style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "maroon", icon = icon("object-ungroup", color = 'white'))
-      
-    } else {
-      
-      data <- subset(data, subset = year == input$slider1)
-      
-      area <- (sum(data$polygon_area)/1000000)
-      
-      (tags$p(round(area,2), 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
-        valueBox(
-          subtitle = tags$p("Polygon Area (km^2)", 
-                            style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "maroon", icon = icon("object-ungroup", color = 'lolo'))
-      
-    }
+    data <- subset(data, subset = zipcode %in% input$specifyPolygon)
+    
+    return(data)
     
   })
   
+  # output$info_box1 <- renderValueBox({
+  #   
+  #   data <- infoBoxData()
+  #   
+  #   if (is.null(data)) {
+  #     
+  #     (tags$p(NULL, 
+  #             style = "font-size: 100%;  font-weight: bold;")) %>%
+  #       valueBox(
+  #         subtitle = tags$p("Polygon Area (square kms)", 
+  #                           style = "font-size: 100%; margin:0; padding: 0;"),
+  #         color = "maroon", icon = icon("object-ungroup", color = 'white'))
+  #     
+  #   } else {
+  #     
+  #     data <- subset(data, subset = year == input$slider1)
+  #     
+  #     area <- (sum(data$polygon_area))
+  #     
+  #     (tags$p(round(area,2), 
+  #             style = "font-size: 100%;  font-weight: bold;")) %>%
+  #       valueBox(
+  #         subtitle = tags$p("Polygon Area (square kms)", 
+  #                           style = "font-size: 100%; margin:0; padding: 0;"),
+  #         color = "maroon", icon = icon("object-ungroup", color = 'lolo'))
+  #     
+  #   }
+  #   
+  # })
+  
   output$info_box2 <- renderInfoBox({
     
-    data <- panelData()
-    
-    if (is.null(data)) {
+    tryCatch({
       
-      (tags$p(NULL, 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
+      data <- infoBoxData()
+      
+      if (is.null(data)) {
+        
+        (tags$p(NULL, 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p("Lawn Area (square meters)", 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "navy", icon = icon("pagelines", color = 'white'))
+        
+      } else {
+        
+        data <- subset(data, subset = year == input$slider1)
+        
+        area <- (sum(data$lawn_area))
+        
+        (tags$p(round(area,2), 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p("Lawn Area (square meters)", 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "navy", icon = icon("pagelines", color = 'lolo'))
+        
+      }
+      
+    }, error = function(e) {
+      
+      (tags$p("Something went wrong :(", 
+              style = "font-size: 80%;  font-weight: bold;")) %>%
         valueBox(
-          subtitle = tags$p("Lawn Area (km^2)", 
+          subtitle = tags$p("Please refresh app and try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
           color = "navy", icon = icon("pagelines", color = 'white'))
       
-    } else {
-      
-      data <- subset(data, subset = year == input$slider1)
-      
-      area <- (sum(data$lawn_area)/1000000)
-      
-      (tags$p(round(area,2), 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
-        valueBox(
-          subtitle = tags$p("Lawn Area (km^2)", 
-                            style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "navy", icon = icon("pagelines", color = 'lolo'))
-      
-    }
+    })
     
   })
   
   output$info_box3 <- renderInfoBox({
     
-    data <- panelData()
-    
-    if (is.null(data)) {
+    tryCatch({
       
-      (tags$p(NULL, 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
+      data <- infoBoxData()
+      
+      if (is.null(data)) {
+        
+        (tags$p(NULL, 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p("Tree Coverage Area (square meters)", 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "teal", icon = icon("tree", color = 'white'))
+        
+      } else {
+        
+        data <- subset(data, subset = year == input$slider1)
+        
+        area <- (sum(data$tree_area))
+        
+        (tags$p(round(area,2), 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p("Tree Coverage Area (square meters)", 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "teal", icon = icon("tree", color = 'lolo'))
+        
+      }
+      
+    }, error = function(e){
+      
+      (tags$p("Something went wrong :(", 
+              style = "font-size: 80%;  font-weight: bold;")) %>%
         valueBox(
-          subtitle = tags$p("Tree Coverage Area (km^2)", 
+          subtitle = tags$p("Please refresh app and try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
           color = "teal", icon = icon("tree", color = 'white'))
       
-    } else {
-      
-      data <- subset(data, subset = year == input$slider1)
-      
-      area <- (sum(data$tree_area)/1000000)
-      
-      (tags$p(round(area,2), 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
-        valueBox(
-          subtitle = tags$p("Tree Coverage Area (km^2)", 
-                            style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "teal", icon = icon("tree", color = 'lolo'))
-      
-    }
+    })
     
   })
   
   output$info_box4 <- renderInfoBox({
     
-    data <- panelData()
-    
-    if (is.null(data)) {
+    tryCatch({
       
-      (tags$p(NULL, 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
+      data <- infoBoxData()
+      
+      if (is.null(data)) {
+        
+        (tags$p(NULL, 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p("Impervious Area (square kms)", 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "olive", icon = icon("road", color = 'white'))
+        
+      } else {
+        
+        data <- subset(data, subset = year == input$slider1)
+        
+        area <- (sum(data$impervious_area))
+        
+        (tags$p(round(area,2), 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p("Impervious Area (square kms)", 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "olive", icon = icon("road", color = 'lolo'))
+        
+      }
+      
+    }, error = function(e) {
+      
+      (tags$p("Something went wrong :(", 
+              style = "font-size: 80%;  font-weight: bold;")) %>%
         valueBox(
-          subtitle = tags$p("Impervious Area (km^2)", 
+          subtitle = tags$p("Please refresh app and try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
           color = "olive", icon = icon("road", color = 'white'))
       
-    } else {
-      
-      data <- subset(data, subset = year == input$slider1)
-      
-      area <- (sum(data$impervious_area)/1000000)
-      
-      (tags$p(round(area,2), 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
-        valueBox(
-          subtitle = tags$p("Impervious Area (km^2)", 
-                            style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "olive", icon = icon("road", color = 'lolo'))
-      
-    }
+    })
     
   })
   
   output$info_box5 <- renderInfoBox({
     
-    data <- panelData()
-    
-    if (is.null(data)) {
+    tryCatch({
       
-      (tags$p(NULL, 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
+      data <- infoBoxData()
+      
+      if (is.null(data)) {
+        
+        (tags$p(NULL, 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p("Water Body Area (square kms)", 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "lime", icon = icon("tint", color = 'white'))
+        
+      } else {
+        
+        data <- subset(data, subset = year == input$slider1)
+        
+        area <- (sum(data$water_area))
+        
+        (tags$p(round(area,2), 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p("Water Body Area (square kms)", 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "lime", icon = icon("tint", color = 'lolo'))
+        
+      }
+      
+    }, error = function(e){
+      
+      (tags$p("Something went wrong :(", 
+              style = "font-size: 80%;  font-weight: bold;")) %>%
         valueBox(
-          subtitle = tags$p("Water Body Area (km^2)", 
+          subtitle = tags$p("Please refresh app and try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
           color = "lime", icon = icon("tint", color = 'white'))
       
-    } else {
-      
-      data <- subset(data, subset = year == input$slider1)
-      
-      area <- (sum(data$water_area)/1000000)
-      
-      (tags$p(round(area,2), 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
-        valueBox(
-          subtitle = tags$p("Water Body Area (km^2)", 
-                            style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "lime", icon = icon("tint", color = 'lolo'))
-      
-    }
+    })
     
   })
   
   output$info_box6 <- renderInfoBox({
     
-    data <- panelData()
-    
-    if (is.null(data)) {
+    tryCatch({
       
-      (tags$p(NULL, 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
+      data <- infoBoxData()
+      
+      if (is.null(data)) {
+        
+        (tags$p(NULL, 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p("Soil Area (square kms)", 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "purple", icon = icon("align-center", color = 'white'))
+        
+      } else {
+        
+        data <- subset(data, subset = year == input$slider1)
+        
+        area <- (sum(data$soil_area))
+        
+        (tags$p(round(area,2), 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p("Soil Area (square kms)", 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "purple", icon = icon("align-center", color = 'lolo'))
+        
+      }
+      
+    }, error = function(e) {
+      
+      (tags$p("Something went wrong :(", 
+              style = "font-size: 80%;  font-weight: bold;")) %>%
         valueBox(
-          subtitle = tags$p("Soil Area (km^2)", 
+          subtitle = tags$p("Please refresh app and try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
           color = "purple", icon = icon("align-center", color = 'white'))
       
-    } else {
-      
-      data <- subset(data, subset = year == input$slider1)
-      
-      area <- (sum(data$soil_area)/1000000)
-      
-      (tags$p(round(area,2), 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
-        valueBox(
-          subtitle = tags$p("Soil Area (km^2)", 
-                            style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "purple", icon = icon("align-center", color = 'lolo'))
-      
-    }
+    })
     
   })
   
   output$info_box7 <- renderInfoBox({
     
-    data <- panelData()
-    
-    if (is.null(data)) {
+    tryCatch({
       
-      (tags$p(NULL, 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
+      data <- infoBoxData()
+      
+      if (is.null(data)) {
+        
+        (tags$p(NULL, 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p("Turf Area (square kms)", 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "fuchsia", icon = icon("futbol-o", color = 'white'))
+        
+      } else {
+        
+        data <- subset(data, subset = year == input$slider1)
+        
+        area <- (sum(data$turf_area))
+        
+        (tags$p(round(area,2), 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p("Turf Area (square kms)", 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "fuchsia", icon = icon("futbol-o", color = 'white'))
+        
+      }
+      
+    }, error = function(e){
+      
+      (tags$p("Something went wrong :(", 
+              style = "font-size: 80%;  font-weight: bold;")) %>%
         valueBox(
-          subtitle = tags$p("Turf Area (km^2)", 
+          subtitle = tags$p("Please refresh app and try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
           color = "fuchsia", icon = icon("futbol-o", color = 'white'))
       
-    } else {
-      
-      data <- subset(data, subset = year == input$slider1)
-      
-      area <- (sum(data$turf_area)/1000000)
-      
-      (tags$p(round(area,2), 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
-        valueBox(
-          subtitle = tags$p("Turf Area (km^2)", 
-                            style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "fuchsia", icon = icon("futbol-o", color = 'white'))
-      
-    }
+    })
     
   })
   
   
   ##########################################################################
   
-  output$info_box1b <- renderInfoBox({
+  customPolygonAreas <- reactive({
     
     data <- as.data.frame(response())
     
-    if (is.null(data)) {
+    polygon_area <- (sum(data$polygon_area))
+    
+    ###LAWNS
+    
+    lawn_area <- (sum(data$grass_area))
+    
+    if (input$slider1a < -100) {
       
-      (tags$p(NULL, 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
-        valueBox(
-          subtitle = tags$p("Polygon Area (m^2)", 
-                            style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "maroon", icon = icon("object-ungroup", color = 'white'))
+      lawnRate <- -100
       
-    } else {
+    } else { lawnRate <- input$slider1a}
+    
+    lawn_areaB <- (lawn_area * (1 + (lawnRate/100)))
+    
+    ###TREES
+    
+    tree_area <- (sum(data$tree_area))
+    
+    if (input$slider2a < -100) {
       
-      data <- as.data.frame(response())
+      treeRate <- -100
       
-      area <- (sum(data$polygon_area))
+    } else { treeRate <- input$slider2a}
+    
+    tree_areaB <- (tree_area * (1 + (treeRate/100)))
+    
+    ###IMPERVIOUS
+    
+    impervious_area <- (sum(data$impervious_area))
+    
+    if (input$slider3a < -100) {
       
-      (tags$p(round(area,2), 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
-        valueBox(
-          subtitle = tags$p("Polygon Area (m^2)", 
-                            style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "maroon", icon = icon("object-ungroup", color = 'lolo'))
+      imperviousRate <- -100
+      
+    } else { imperviousRate <- input$slider3a}
+    
+    impervious_areaB <- (impervious_area * (1 + (imperviousRate/100)))
+    
+    ###SOIL
+    
+    soil_area <- (sum(data$soil_area))
+    
+    if (input$slider4a < -100) {
+      
+      soilRate <- -100
+      
+    } else { soilRate <- input$slider4a}
+    
+    soil_areaB <- (soil_area * (1 + (soilRate/100)))
+    
+    ###WATER
+    
+    water_area <- (sum(data$water_area))
+    
+    if (input$slider5a < -100) {
+      
+      waterRate <- -100
+      
+    } else { waterRate <- input$slider5a}
+    
+    
+    water_areaB <- (water_area * (1 + (waterRate/100)))
+    
+    ###TURF
+    
+    turf_area <- (sum(data$turf_area))
+    
+    if (input$slider6a < -100) {
+      
+      turfRate <- -100
+      
+    } else { turfRate <- input$slider6a}
+    
+    turf_areaB <- (turf_area * (1 + (turfRate/100)))
+    
+    ###END
+    
+    areaRatio <- (tree_areaB+lawn_areaB+impervious_areaB+soil_areaB+
+                    water_areaB+turf_areaB) / polygon_area
+    
+    areaList <- list(polygon_area,lawn_area,lawn_areaB,tree_area,tree_areaB,
+                     impervious_area,impervious_areaB,soil_area,soil_areaB,
+                     water_area,water_areaB,turf_area,turf_areaB,areaRatio)
+    
+    return(areaList)
+    
+  })
+  
+  microClimateInference <- reactive({
+    
+    data <- customPolygonAreas()
+    
+    polygonArea <- data[[1]]
+    
+    grassAreaStart <- data[[2]]/polygonArea
+    treeAreaStart <- data[[4]]/polygonArea
+    waterAreaStart <- data[[10]]/polygonArea
+    soilAreaStart <- data[[8]]/polygonArea
+    turfAreaStart <- data[[12]]/polygonArea
+    
+    areastart <- data.frame(grass=grassAreaStart,tree=treeAreaStart,
+                            water=waterAreaStart,soil=soilAreaStart,
+                            turf=turfAreaStart)
+    
+    grassAreaEnd <- data[[3]]/polygonArea
+    treeAreaEnd <- data[[5]]/polygonArea
+    waterAreaEnd <- data[[11]]/polygonArea
+    soilAreaEnd <- data[[9]]/polygonArea
+    turfAreaEnd <- data[[13]]/polygonArea
+    
+    areaEnd <- data.frame(grass=grassAreaEnd,tree=treeAreaEnd,
+                          water=waterAreaEnd,soil=soilAreaEnd,
+                          turf=turfAreaEnd)
+    
+    if (input$inferenceModel == 'Random Forest Model') {
+      
+      model1 <- 'RFDay'
+      model2 <- 'RFNight'
+      
+    } else if (input$inferenceModel == 'TensorFlow Model') {
+      
+      model1 <- 'TFDay'
+      model2 <- 'TFNight'
       
     }
+    
+    usedModel <- subset(estimatesData, subset = model == model1)
+    
+    y1Day = areastart$grass*usedModel$grassEstimate + 
+      areastart$tree * usedModel$treeEstimate +
+      areastart$water * usedModel$waterEstimate +
+      areastart$soil * usedModel$soilEstimate +
+      areastart$turf * usedModel$turfEstimate
+    
+    y2Day = areaEnd$grass*usedModel$grassEstimate + 
+      areaEnd$tree * usedModel$treeEstimate +
+      areaEnd$water * usedModel$waterEstimate +
+      areaEnd$soil * usedModel$soilEstimate +
+      areaEnd$turf * usedModel$turfEstimate
+    
+    ytotalDay <- y2Day-y1Day
+    
+    y1MaxDay = areastart$grass*usedModel$grassMax + 
+      areastart$tree * usedModel$treeMax +
+      areastart$water * usedModel$waterMax +
+      areastart$soil * usedModel$soilMax +
+      areastart$turf * usedModel$turfMax
+    
+    y2MaxDay = areaEnd$grass*usedModel$grassMax + 
+      areaEnd$tree * usedModel$treeMax +
+      areaEnd$water * usedModel$waterMax +
+      areaEnd$soil * usedModel$soilMax +
+      areaEnd$turf * usedModel$turfMax
+    
+    ytotalMaxDay <- y2MaxDay-y1MaxDay
+    
+    y1MinDay = areastart$grass*usedModel$grassMin + 
+      areastart$tree * usedModel$treeMin +
+      areastart$water * usedModel$waterMin +
+      areastart$soil * usedModel$soilMin +
+      areastart$turf * usedModel$turfMin
+    
+    y2MinDay = areaEnd$grass*usedModel$grassMin + 
+      areaEnd$tree * usedModel$treeMin +
+      areaEnd$water * usedModel$waterMin +
+      areaEnd$soil * usedModel$soilMin +
+      areaEnd$turf * usedModel$turfMin
+    
+    ytotalMinDay <- y2MinDay-y1MinDay
+    
+    usedModelB <- subset(estimatesData, subset = model == model2)
+    
+    y1Night = areastart$grass*usedModelB$grassEstimate + 
+      areastart$tree * usedModelB$treeEstimate +
+      areastart$water * usedModelB$waterEstimate +
+      areastart$soil * usedModelB$soilEstimate +
+      areastart$turf * usedModelB$turfEstimate
+    
+    y2Night = areaEnd$grass*usedModelB$grassEstimate + 
+      areaEnd$tree * usedModelB$treeEstimate +
+      areaEnd$water * usedModelB$waterEstimate +
+      areaEnd$soil * usedModelB$soilEstimate +
+      areaEnd$turf * usedModelB$turfEstimate
+    
+    ytotalNight <- y2Night-y1Night
+    
+    y1MaxNight = areastart$grass*usedModelB$grassMax + 
+      areastart$tree * usedModelB$treeMax +
+      areastart$water * usedModelB$waterMax +
+      areastart$soil * usedModelB$soilMax +
+      areastart$turf * usedModelB$turfMax
+    
+    y2MaxNight = areaEnd$grass*usedModelB$grassMax + 
+      areaEnd$tree * usedModelB$treeMax +
+      areaEnd$water * usedModelB$waterMax +
+      areaEnd$soil * usedModelB$soilMax +
+      areaEnd$turf * usedModelB$turfMax
+    
+    ytotalMaxNight <- y2MaxNight-y1MaxNight
+    
+    y1MinNight = areastart$grass*usedModelB$grassMin + 
+      areastart$tree * usedModelB$treeMin +
+      areastart$water * usedModelB$waterMin +
+      areastart$soil * usedModelB$soilMin +
+      areastart$turf * usedModelB$turfMin
+    
+    y2MinNight = areaEnd$grass*usedModelB$grassMin + 
+      areaEnd$tree * usedModelB$treeMin +
+      areaEnd$water * usedModelB$waterMin +
+      areaEnd$soil * usedModelB$soilMin +
+      areaEnd$turf * usedModelB$turfMin
+    
+    ytotalMinNight <- y2MinNight-y1MinNight
+    
+    inferenceList <- list(ytotalDay,ytotalMaxDay,ytotalMinDay,
+                          ytotalNight,ytotalMaxNight,ytotalMinNight)
+    
+    return(inferenceList)
+    
+  })
+  
+  output$MCPlot <- renderPlotly({
+    
+    tryCatch({
+      
+      ytotalDay <- microClimateInference()[[1]]
+      ytotalMaxDay <- microClimateInference()[[2]]
+      ytotalMinDay <- microClimateInference()[[3]]
+      ytotalNight <- microClimateInference()[[4]]
+      ytotalMaxNight <- microClimateInference()[[5]]
+      ytotalMinNight <- microClimateInference()[[6]]
+      
+      MCPlotDF <- data.frame('label'=NA,'value'=NA)
+      
+      row1 <- c('DayTempDelta',ytotalDay)
+      row2 <- c('DayTempDelta',ytotalMaxDay)
+      row3 <- c('DayTempDelta',ytotalMinDay)
+      row4 <- c('NightTempDelta',ytotalNight)
+      row5 <- c('NightTempDelta',ytotalMaxNight)
+      row6 <- c('NightTempDelta',ytotalMinNight)
+      
+      MCPlotDF <- rbind(MCPlotDF,row1)
+      MCPlotDF <- rbind(MCPlotDF,row2)
+      MCPlotDF <- rbind(MCPlotDF,row3)
+      MCPlotDF <- rbind(MCPlotDF,row4)
+      MCPlotDF <- rbind(MCPlotDF,row5)
+      MCPlotDF <- rbind(MCPlotDF,row6)
+      
+      MCPlotDF$label <- as.factor(MCPlotDF$label)
+      
+      MCPlotDF <- na.omit(MCPlotDF)
+      
+      if (ytotalDay != 0) {
+        
+        MCPlotDF[,2] <- as.numeric(MCPlotDF[,2])
+        
+      }
+      
+      ggplot(data = MCPlotDF, aes(x=label,y=value, color = label, fill = label)) + 
+        geom_boxplot(alpha = 0.3) + 
+        theme_bw() +
+        labs(title = "Microclimate Impact",
+             x="",
+             y="Impact in Delta Degrees Celsius")+
+        theme(plot.background = element_rect(fill = "#F8F8F8")) +
+        theme(legend.position="none")
+      
+    }, error = function(e) {
+      
+      ggplot()
+      
+    })
+    
+  })
+  
+  output$microClimateOutputs <- renderUI({
+    
+    ytotalDay <- microClimateInference()[[1]]
+    ytotalMaxDay <- microClimateInference()[[2]]
+    ytotalMinDay <- microClimateInference()[[3]]
+    ytotalNight <- microClimateInference()[[4]]
+    ytotalMaxNight <- microClimateInference()[[5]]
+    ytotalMinNight <- microClimateInference()[[6]]
+    
+    str2 <- paste("Daytime average temperature effect<br> (in degrees Celsius)")
+    str3 <- paste0(paste0("5%: ", round(ytotalMinDay,2),
+                          "° C       |      Estimate: ",round(ytotalDay,2),
+                          "° C       |      95%: ", round(ytotalMaxDay,2),"° C"))
+    str4 <- paste("Night-time average temperature effect<br> (in degrees Celsius)")
+    str5 <- paste0(paste0("5%: ", round(ytotalMinNight,2), 
+                          "° C       |      Estimate: ",round(ytotalNight,2), 
+                          "° C       |      95%: ", round(ytotalMaxNight,2),"° C"))
+    
+    HTML(paste("<h4>",str2,"</h4>",
+               "<h5>",str3,"<h5>",
+               "<br>",
+               "<h4>",str4,"</h4>",
+               "<h5>",str5,"</h5>"
+    ))
+    
+  })
+  
+  output$info_box1b <- renderInfoBox({
+    
+    tryCatch({
+      
+      data <- customPolygonAreas()
+      
+      if(input$metric == 'meters') {
+        
+        multiplier <- 1
+        units <- '(square meters)'
+        
+      } else { 
+        
+        multiplier <- 1000000
+        units <- '(square kms)'
+        
+      }
+      
+      if (is.null(data)) {
+        
+        (tags$p(NULL, 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p(paste0("Polygon Area ",units), 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "maroon", icon = icon("object-ungroup", color = 'white'))
+        
+      } else {
+        
+        data <- customPolygonAreas()
+        
+        area <- data[[1]]/multiplier
+        
+        (tags$p(round(area,2), 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p(paste0("Polygon Area ",units), 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "maroon", icon = icon("object-ungroup", color = 'lolo'))
+        
+      }
+      
+    }, error = function(e) {
+      
+      (tags$p("Something went wrong :( ",
+              style = "font-size: 80%;  font-weight: bold;")) %>%
+        valueBox(
+          subtitle = tags$p("Please refresh app and try again.", 
+                            style = "font-size: 100%; margin:0; padding: 0;"),
+          color = "maroon", icon = icon("object-ungroup"))
+      
+    })
     
   })
   
   output$info_box2b <- renderInfoBox({
     
-    data <- as.data.frame(response())
-    
-    if (is.null(data)) {
+    tryCatch({
       
-      (tags$p(NULL, 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
+      if(input$metric == 'meters') {
+        
+        multiplier <- 1
+        units <- '(square meters)'
+        
+      } else { 
+        
+        multiplier <- 1000000
+        units <- '(square kms)'
+        
+      }
+      
+      data <- customPolygonAreas()
+      
+      if (is.null(data)) {
+        
+        (tags$p(NULL, 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p(paste0("Grass Area ",units), 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "navy", icon = icon("pagelines", color = 'white'))
+        
+      } else {
+        
+        data <- customPolygonAreas()
+        
+        area <- data[[2]]/multiplier
+        finalArea <- data[[3]]/multiplier
+        
+        (tags$p(round(finalArea,2), 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p(paste0("Grass Area ",units), 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "navy", icon = icon("pagelines", color = 'lolo'))
+        
+      }
+      
+    }, error = function(e) {
+      
+      (tags$p("Something went wrong :( ",
+              style = "font-size: 80%;  font-weight: bold;")) %>%
         valueBox(
-          subtitle = tags$p("Lawn Area (km^2)", 
+          subtitle = tags$p("Please refresh app and try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "navy", icon = icon("pagelines", color = 'white'))
+          color = "navy", icon = icon("pagelines"))
       
-    } else {
-      
-      data <- as.data.frame(response())
-      
-      area <- (sum(data$grass_area))
-      
-      (tags$p(round(area,2), 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
-        valueBox(
-          subtitle = tags$p("Lawn Area (m^2)", 
-                            style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "navy", icon = icon("pagelines", color = 'lolo'))
-      
-    }
+    })
     
   })
   
   output$info_box3b <- renderInfoBox({
     
-    data <- as.data.frame(response())
-    
-    if (is.null(data)) {
+    tryCatch({
       
-      (tags$p(NULL, 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
+      if(input$metric == 'meters') {
+        
+        multiplier <- 1
+        units <- '(square meters)'
+        
+      } else { 
+        
+        multiplier <- 1000000
+        units <- '(square kms)'
+        
+      }
+      
+      data <- customPolygonAreas()
+      
+      if (is.null(data)) {
+        
+        (tags$p(NULL, 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p(paste0("Tree Area ",units), 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "teal", icon = icon("tree", color = 'white'))
+        
+      } else {
+        
+        data <- customPolygonAreas()
+        
+        area <- data[[4]]/multiplier
+        finalArea <- data[[5]]/multiplier
+        
+        (tags$p(round(finalArea,2), 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p(paste0("Tree Area ",units), 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "teal", icon = icon("tree", color = 'lolo'))
+        
+      }
+      
+    }, error = function(e){
+      
+      (tags$p("Something went wrong :( ",
+              style = "font-size: 80%;  font-weight: bold;")) %>%
         valueBox(
-          subtitle = tags$p("Tree Coverage Area (km^2)", 
+          subtitle = tags$p("Please refresh app and try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "teal", icon = icon("tree", color = 'white'))
+          color = "teal", icon = icon("tree"))
       
-    } else {
-      
-      data <- as.data.frame(response())
-      
-      area <- (sum(data$tree_area))
-      
-      (tags$p(round(area,2), 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
-        valueBox(
-          subtitle = tags$p("Tree Coverage Area (m^2)", 
-                            style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "teal", icon = icon("tree", color = 'lolo'))
-      
-    }
+    })
     
   })
   
   output$info_box4b <- renderInfoBox({
     
-    data <- as.data.frame(response())
-    
-    if (is.null(data)) {
+    tryCatch({
       
-      (tags$p(NULL, 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
+      if(input$metric == 'meters') {
+        
+        multiplier <- 1
+        units <- '(square meters)'
+        
+      } else { 
+        
+        multiplier <- 1000000
+        units <- '(square kms)'
+        
+      }
+      
+      data <- customPolygonAreas()
+      
+      if (is.null(data)) {
+        
+        (tags$p(NULL, 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p(paste0("Impervious Area ",units),  
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "olive", icon = icon("road", color = 'white'))
+        
+      } else {
+        
+        data <- customPolygonAreas()
+        
+        area <- data[[6]]/multiplier
+        finalArea <- data[[7]]/multiplier
+        
+        (tags$p(round(finalArea,2), 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p(paste0("Impervious Area ",units), 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "olive", icon = icon("road", color = 'lolo'))
+        
+      }
+      
+    }, error = function(e) {
+      
+      (tags$p("Something went wrong :( ",
+              style = "font-size: 80%;  font-weight: bold;")) %>%
         valueBox(
-          subtitle = tags$p("Impervious Area (km^2)", 
+          subtitle = tags$p("Please refresh app and try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "olive", icon = icon("road", color = 'white'))
+          color = "olive", icon = icon("road"))
       
-    } else {
-      
-      data <- as.data.frame(response())
-      
-      area <- (sum(data$impervious_area))
-      
-      (tags$p(round(area,2), 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
-        valueBox(
-          subtitle = tags$p("Impervious Area (m^2)", 
-                            style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "olive", icon = icon("road", color = 'lolo'))
-      
-    }
+    })
     
   })
   
   output$info_box5b <- renderInfoBox({
     
-    data <- as.data.frame(response())
-    
-    if (is.null(data)) {
+    tryCatch({
       
-      (tags$p(NULL, 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
+      if(input$metric == 'meters') {
+        
+        multiplier <- 1
+        units <- '(square meters)'
+        
+      } else { 
+        
+        multiplier <- 1000000
+        units <- '(square kms)'
+        
+      }
+      
+      data <- customPolygonAreas()
+      
+      if (is.null(data)) {
+        
+        (tags$p(NULL, 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p(paste0("Water Area ",units), 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "lime", icon = icon("tint", color = 'white'))
+        
+      } else {
+        
+        data <- customPolygonAreas()
+        
+        area <- data[[10]]/multiplier
+        finalArea <- data[[11]]/multiplier
+        
+        (tags$p(round(finalArea,2), 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p(paste0("Water Area ",units), 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "lime", icon = icon("tint", color = 'lolo'))
+        
+      }
+      
+    }, error = function(e) {
+      
+      (tags$p("Something went wrong :( ",
+              style = "font-size: 80%;  font-weight: bold;")) %>%
         valueBox(
-          subtitle = tags$p("Water Body Area (km^2)", 
+          subtitle = tags$p("Please refresh app and try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "lime", icon = icon("tint", color = 'white'))
+          color = "lime", icon = icon("tint"))
       
-    } else {
-      
-      data <- as.data.frame(response())
-      
-      area <- (sum(data$water_area))
-      
-      (tags$p(round(area,2), 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
-        valueBox(
-          subtitle = tags$p("Water Body Area (m^2)", 
-                            style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "lime", icon = icon("tint", color = 'lolo'))
-      
-    }
+    })
     
   })
   
   output$info_box6b <- renderInfoBox({
     
-    data <- as.data.frame(response())
-    
-    if (is.null(data)) {
+    tryCatch({
       
-      (tags$p(NULL, 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
+      if(input$metric == 'meters') {
+        
+        multiplier <- 1
+        units <- '(square meters)'
+        
+      } else { 
+        
+        multiplier <- 1000000
+        units <- '(square kms)'
+        
+      }
+      
+      data <- customPolygonAreas()
+      
+      if (is.null(data)) {
+        
+        (tags$p(NULL, 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p(paste0("Soil Area ",units), 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "purple", icon = icon("align-center", color = 'white'))
+        
+      } else {
+        
+        data <- customPolygonAreas()
+        
+        area <- data[[8]]/multiplier
+        finalArea <- data[[9]]/multiplier
+        
+        (tags$p(round(finalArea,2), 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p(paste0("Soil Area ",units), 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "purple", icon = icon("align-center", color = 'lolo'))
+        
+      }
+      
+    }, error = function(e) {
+      
+      (tags$p("Something went wrong :( ",
+              style = "font-size: 80%;  font-weight: bold;")) %>%
         valueBox(
-          subtitle = tags$p("Soil Area (km^2)", 
+          subtitle = tags$p("Please refresh app and try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "purple", icon = icon("align-center", color = 'white'))
+          color = "purple", icon = icon("align-center"))
       
-    } else {
-      
-      data <- as.data.frame(response())
-      
-      area <- (sum(data$soil_area))
-      
-      (tags$p(round(area,2), 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
-        valueBox(
-          subtitle = tags$p("Soil Area (m^2)", 
-                            style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "purple", icon = icon("align-center", color = 'lolo'))
-      
-    }
+    })
     
   })
   
   output$info_box7b <- renderInfoBox({
     
-    data <- as.data.frame(response())
-    
-    if (is.null(data)) {
+    tryCatch({
       
-      (tags$p(NULL, 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
+      if(input$metric == 'meters') {
+        
+        multiplier <- 1
+        units <- '(square meters)'
+        
+      } else { 
+        
+        multiplier <- 1000000
+        units <- '(square kms)'
+        
+      }
+      
+      data <- customPolygonAreas()
+      
+      if (is.null(data)) {
+        
+        (tags$p(NULL, 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p(paste0("Turf Area ",units), 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "fuchsia", icon = icon("futbol-o", color = 'white'))
+        
+      } else {
+        
+        data <- customPolygonAreas()
+        
+        area <- data[[12]]/multiplier
+        finalArea <- data[[13]]/multiplier
+        
+        (tags$p(round(finalArea,2), 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p(paste0("Turf Area ",units), 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "fuchsia", icon = icon("futbol-o", color = 'white'))
+        
+      }
+      
+    }, error = function(e) {
+      
+      (tags$p("Something went wrong :( ",
+              style = "font-size: 80%;  font-weight: bold;")) %>%
         valueBox(
-          subtitle = tags$p("Turf Area (km^2)", 
+          subtitle = tags$p("Please refresh app and try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
           color = "fuchsia", icon = icon("futbol-o", color = 'white'))
       
-    } else {
-      
-      data <- as.data.frame(response())
-      
-      area <- (sum(data$turf_area))
-      
-      (tags$p(round(area,2), 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
-        valueBox(
-          subtitle = tags$p("Turf Area (m^2)", 
-                            style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "fuchsia", icon = icon("futbol-o", color = 'white'))
-      
-    }
+    })
     
   })
   
   output$info_box2a <- renderInfoBox({
     
-    data <- as.data.frame(response())
-    
-    if (is.null(data)) {
+    tryCatch({
       
-      (tags$p(NULL, 
+      if(input$metric == 'meters') {
+        
+        multiplier <- 1
+        units <- '(square meters)'
+        
+      } else { 
+        
+        multiplier <- 1000000
+        units <- '(square kms)'
+        
+      }
+      
+      data <- customPolygonAreas()
+      
+      if (is.null(data)) {
+        
+        (tags$p(NULL, 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p("Total transformed area", 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "black")
+        
+      } else {
+        
+        data <- customPolygonAreas()
+        
+        area <- data[[14]]
+        
+        area <- round(area*100,0)
+        
+        if (area == 100) {
+          
+          boxColor <- 'black'
+          
+        } else {
+          
+          boxColor <- 'red'
+          
+        }
+        
+        (tags$p(paste0(area,'%'), 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p("Total transformed area", 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = as.character(boxColor))
+        
+      }
+      
+    }, error = function(e) {
+      
+      (tags$p("Draw a polygon", 
               style = "font-size: 100%;  font-weight: bold;")) %>%
         valueBox(
           subtitle = tags$p("Total transformed area", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "black", icon = icon("futbol-o", color = 'white'))
+          color = "black")
       
-    } else {
-      
-      data <- as.data.frame(response())
-      
-      area <- (sum(data$turf_area))
-      
-      (tags$p(paste0('100%'), 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
-        valueBox(
-          subtitle = tags$p("Total transformed area", 
-                            style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "black", icon = icon("futbol-o", color = 'white'))
-      
-    }
+    })
     
   })
   
-  output$inferencePlot <- renderPlotly({
+  # output$inferencePlot <- renderPlotly({
+  #   
+  #   tryCatch({
+  #     
+  #     # data <- fread('inferencePlot.csv')
+  #     # 
+  #     # ggplot(data = data, aes(x=xCoord,y=yCoord,fill = value)) + 
+  #     #   geom_tile()+ 
+  #     #   theme(legend.position='none') +
+  #     #   theme(axis.line = element_blank(),
+  #     #         panel.grid.major = element_blank(),
+  #     #         panel.grid.minor = element_blank(),
+  #     #         panel.border = element_blank(),
+  #     #         panel.background = element_blank(),
+  #     #         axis.text.x=element_blank(), #remove x axis labels
+  #     #         axis.ticks.x=element_blank(), #remove x axis ticks
+  #     #         axis.text.y=element_blank(),  #remove y axis labels
+  #     #         axis.ticks.y=element_blank()) +
+  #     #   labs(x='',y='')
+  #     
+  #   }, error = function(e){
+  #     
+  #     ggplot()
+  #     
+  #   })
+  #   
+  # })
+  
+  output$inferencePlot <- renderPlot({
+    # When input$n is 3, filename is ./images/image3.jpeg
     
-    data <- fread('inferencePlot.csv')
-    
-    ggplot(data = data, aes(x=xCoord,y=yCoord,fill = value)) + 
-      geom_tile()+ 
-      theme(legend.position='none') +
-      theme(axis.line = element_blank(),
-            panel.grid.major = element_blank(),
-            panel.grid.minor = element_blank(),
-            panel.border = element_blank(),
-            panel.background = element_blank(),
-            axis.text.x=element_blank(), #remove x axis labels
-            axis.ticks.x=element_blank(), #remove x axis ticks
-            axis.text.y=element_blank(),  #remove y axis labels
-            axis.ticks.y=element_blank()) +
-      labs(x='',y='')
+    # data <- customPolygonAreas()
+    # 
+    # polygonArea <- data[[1]]
+    # 
+    # if (polygonArea > 0) {
+    #   
+    #   filename <- normalizePath(file.path('C:/Users/crort/OneDrive/Desktop/CapstoneProject/',
+    #                                       paste('inferenceImageCropped', input$n, '.png', sep='')))
+    #   
+    #   # Return a list containing the filename and alt text
+    #   list(src = filename,
+    #        alt = paste("Image number", input$n))
+    #   
+    # } else {
+    #   
+    #   filename <- normalizePath(file.path('C:/Users/crort/OneDrive/Desktop/CapstoneProject/',
+    #                                       paste('waitingImage', input$n, '.png', sep='')))
+    #   
+    #   # Return a list containing the filename and alt text
+    #   list(src = filename,
+    #        alt = paste("Image number", input$n))
+    #   
+    # }
     
   })
   

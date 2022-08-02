@@ -21,9 +21,9 @@ library(shinyscreenshot)
 source("about.R")
 
 con <- dbConnect(odbc(),
-                 # Driver='Devart ODBC Driver for PostgreSQL',
+                 Driver='Devart ODBC Driver for PostgreSQL',
                  # ^ use on local Windows development environment
-                 Driver='PostgreSQL',
+                 # Driver='PostgreSQL',
                  # ^ Use on shinyapps.io deployment
                  Server='18.204.57.173',
                  Port='5432',
@@ -97,6 +97,8 @@ ui <- dashboardPage(
     tags$style(".small-box.bg-maroon { background-color: #D3D3D3 !important; color: #000000 !important; }"),
     tags$style(".small-box.bg-purple { background-color: #A47041 !important; color: #000000 !important; }"),
     tags$style(".small-box.bg-fuchsia { background-color: #0b9ed5 !important; color: #000000 !important; }"),
+    tags$style(".small-box.bg-purple { background-color: #282C7C !important; color: #000000 !important; }"),
+    tags$style(".small-box.bg-orange { background-color: #FAA41A !important; color: #000000 !important; }"),
     
     tags$head(tags$style(
       HTML('.wrapper {height: auto !important; position:relative; overflow-x:hidden; overflow-y:hidden}')
@@ -175,7 +177,7 @@ ui <- dashboardPage(
                             box(width = 12,
                                 
                                 div(style="height: 78px;",
-                                    numericInput("slider4a", h6("Change water area"),
+                                    numericInput("slider4a", h6("Change soil area"),
                                                  min = -100, max = 200, value = 0,
                                                  step = 1)),
                                 
@@ -184,7 +186,7 @@ ui <- dashboardPage(
                             box(width = 12,
                                 
                                 div(style="height: 78px;",
-                                    numericInput("slider5a", h6("Change soil area"),
+                                    numericInput("slider5a", h6("Change water area"),
                                                  min = -100, max = 200, value = 0,
                                                  step = 1)),
                             ),
@@ -321,6 +323,15 @@ ui <- dashboardPage(
                                sliderInput("slider1", h5("Select year"),
                                            min = 2010, max = 2020, value = 2020,
                                            step = 2),
+                               
+                        ),
+                        
+                        column(width = 2,
+                               
+                               selectInput('metric2', h5("Select units for area"),
+                                           choices = c('meters','kilometers'),
+                                           selected = 'meters',
+                                           multiple = FALSE),
                                
                         ),
                         
@@ -1055,35 +1066,85 @@ server <- function(input, output, session) {
     
   })
   
-  # output$info_box1 <- renderValueBox({
-  #   
-  #   data <- infoBoxData()
-  #   
-  #   if (is.null(data)) {
-  #     
-  #     (tags$p(NULL, 
-  #             style = "font-size: 100%;  font-weight: bold;")) %>%
-  #       valueBox(
-  #         subtitle = tags$p("Polygon Area (square kms)", 
-  #                           style = "font-size: 100%; margin:0; padding: 0;"),
-  #         color = "maroon", icon = icon("object-ungroup", color = 'white'))
-  #     
-  #   } else {
-  #     
-  #     data <- subset(data, subset = year == input$slider1)
-  #     
-  #     area <- (sum(data$polygon_area))
-  #     
-  #     (tags$p(round(area,2), 
-  #             style = "font-size: 100%;  font-weight: bold;")) %>%
-  #       valueBox(
-  #         subtitle = tags$p("Polygon Area (square kms)", 
-  #                           style = "font-size: 100%; margin:0; padding: 0;"),
-  #         color = "maroon", icon = icon("object-ungroup", color = 'lolo'))
-  #     
-  #   }
-  #   
-  # })
+  output$MCinfoBox1 <- renderInfoBox({
+    
+    tryCatch({
+      
+      ytotalDay <- microClimateInference()[[1]]
+      ytotalNight <- microClimateInference()[[4]]
+      
+      if (is.null(ytotalDay)) {
+        
+        (tags$p(NULL, 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p("Please make a land conversion to get micrclimate estimates", 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "orange", icon = icon("sun", color = 'yellow'))
+        
+      } else {
+        
+        (tags$p(paste0(round(ytotalDay,2),"° C"), 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p("Degrees Celsius daytime temperature change", 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "orange", icon = icon("sun", color = 'yellow'))
+        
+      }
+      
+    }, error = function(e) {
+      
+      (tags$p("Please try again", 
+              style = "font-size: 80%;  font-weight: bold;")) %>%
+        valueBox(
+          subtitle = tags$p("Please complete your input or try again.", 
+                            style = "font-size: 100%; margin:0; padding: 0;"),
+          color = "orange", icon = icon("sun", color = 'yellow'))
+      
+    })
+    
+  })
+  
+  output$MCinfoBox2 <- renderInfoBox({
+    
+    tryCatch({
+      
+      ytotalDay <- microClimateInference()[[1]]
+      ytotalNight <- microClimateInference()[[4]]
+      
+      if (is.null(ytotalDay)) {
+        
+        (tags$p(NULL, 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p("Please make a land conversion to get micrclimate estimates", 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "purple", icon = icon("moon", color = 'white'))
+        
+      } else {
+        
+        (tags$p(paste0(round(ytotalNight,2),"° C"), 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p("Degrees Celsius night-time temperature change", 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "purple", icon = icon("moon", color = 'white'))
+        
+      }
+      
+    }, error = function(e) {
+      
+      (tags$p("Please try again", 
+              style = "font-size: 80%;  font-weight: bold;")) %>%
+        valueBox(
+          subtitle = tags$p("Please complete your input or try again.", 
+                            style = "font-size: 100%; margin:0; padding: 0;"),
+          color = "purple", icon = icon("moon", color = 'white'))
+      
+    })
+    
+  })
   
   output$info_box2 <- renderInfoBox({
     
@@ -1091,12 +1152,24 @@ server <- function(input, output, session) {
       
       data <- infoBoxData()
       
+      if(input$metric2 == 'meters') {
+        
+        multiplier <- 1
+        units <- '(square meters)'
+        
+      } else { 
+        
+        multiplier <- 1000000
+        units <- '(square kms)'
+        
+      }
+      
       if (is.null(data)) {
         
         (tags$p(NULL, 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p("Lawn Area (square meters)", 
+            subtitle = tags$p(paste0("Grass Area ",units), 
                               style = "font-size: 100%; margin:0; padding: 0;"),
             color = "navy", icon = icon("pagelines", color = 'white'))
         
@@ -1104,12 +1177,12 @@ server <- function(input, output, session) {
         
         data <- subset(data, subset = year == input$slider1)
         
-        area <- (sum(data$lawn_area))
+        area <- (sum(data$lawn_area))/multiplier
         
         (tags$p(round(area,2), 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p("Lawn Area (square meters)", 
+            subtitle = tags$p(paste0("Grass Area ",units), 
                               style = "font-size: 100%; margin:0; padding: 0;"),
             color = "navy", icon = icon("pagelines", color = 'lolo'))
         
@@ -1117,10 +1190,10 @@ server <- function(input, output, session) {
       
     }, error = function(e) {
       
-      (tags$p("Something went wrong :(", 
+      (tags$p("Please try again", 
               style = "font-size: 80%;  font-weight: bold;")) %>%
         valueBox(
-          subtitle = tags$p("Please refresh app and try again.", 
+          subtitle = tags$p("Please complete your input or try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
           color = "navy", icon = icon("pagelines", color = 'white'))
       
@@ -1134,12 +1207,26 @@ server <- function(input, output, session) {
       
       data <- infoBoxData()
       
+      if(input$metric2 == 'meters') {
+        
+        multiplier <- 1
+        units <- '(square meters)'
+        
+      } else { 
+        
+        multiplier <- 1000000
+        units <- '(square kms)'
+        
+      }
+      
+      data <- infoBoxData()
+      
       if (is.null(data)) {
         
         (tags$p(NULL, 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p("Tree Coverage Area (square meters)", 
+            subtitle = tags$p(paste0("Tree Area ",units), 
                               style = "font-size: 100%; margin:0; padding: 0;"),
             color = "teal", icon = icon("tree", color = 'white'))
         
@@ -1147,12 +1234,12 @@ server <- function(input, output, session) {
         
         data <- subset(data, subset = year == input$slider1)
         
-        area <- (sum(data$tree_area))
+        area <- (sum(data$tree_area))/multiplier
         
         (tags$p(round(area,2), 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p("Tree Coverage Area (square meters)", 
+            subtitle = tags$p(paste0("Tree Area ",units), 
                               style = "font-size: 100%; margin:0; padding: 0;"),
             color = "teal", icon = icon("tree", color = 'lolo'))
         
@@ -1160,10 +1247,10 @@ server <- function(input, output, session) {
       
     }, error = function(e){
       
-      (tags$p("Something went wrong :(", 
+      (tags$p("Please try again", 
               style = "font-size: 80%;  font-weight: bold;")) %>%
         valueBox(
-          subtitle = tags$p("Please refresh app and try again.", 
+          subtitle = tags$p("Please complete your input or try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
           color = "teal", icon = icon("tree", color = 'white'))
       
@@ -1177,12 +1264,26 @@ server <- function(input, output, session) {
       
       data <- infoBoxData()
       
+      if(input$metric2 == 'meters') {
+        
+        multiplier <- 1
+        units <- '(square meters)'
+        
+      } else { 
+        
+        multiplier <- 1000000
+        units <- '(square kms)'
+        
+      }
+      
+      data <- infoBoxData()
+      
       if (is.null(data)) {
         
         (tags$p(NULL, 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p("Impervious Area (square kms)", 
+            subtitle = tags$p(paste0("Impervious Area ",units), 
                               style = "font-size: 100%; margin:0; padding: 0;"),
             color = "olive", icon = icon("road", color = 'white'))
         
@@ -1190,12 +1291,12 @@ server <- function(input, output, session) {
         
         data <- subset(data, subset = year == input$slider1)
         
-        area <- (sum(data$impervious_area))
+        area <- (sum(data$impervious_area))/multiplier
         
         (tags$p(round(area,2), 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p("Impervious Area (square kms)", 
+            subtitle = tags$p(paste0("Impervious Area ",units), 
                               style = "font-size: 100%; margin:0; padding: 0;"),
             color = "olive", icon = icon("road", color = 'lolo'))
         
@@ -1203,10 +1304,10 @@ server <- function(input, output, session) {
       
     }, error = function(e) {
       
-      (tags$p("Something went wrong :(", 
+      (tags$p("Please try again", 
               style = "font-size: 80%;  font-weight: bold;")) %>%
         valueBox(
-          subtitle = tags$p("Please refresh app and try again.", 
+          subtitle = tags$p("Please complete your input or try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
           color = "olive", icon = icon("road", color = 'white'))
       
@@ -1220,12 +1321,26 @@ server <- function(input, output, session) {
       
       data <- infoBoxData()
       
+      if(input$metric2 == 'meters') {
+        
+        multiplier <- 1
+        units <- '(square meters)'
+        
+      } else { 
+        
+        multiplier <- 1000000
+        units <- '(square kms)'
+        
+      }
+      
+      data <- infoBoxData()
+      
       if (is.null(data)) {
         
         (tags$p(NULL, 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p("Water Body Area (square kms)", 
+            subtitle = tagstags$p(paste0("Water Area ",units), 
                               style = "font-size: 100%; margin:0; padding: 0;"),
             color = "lime", icon = icon("tint", color = 'white'))
         
@@ -1233,12 +1348,12 @@ server <- function(input, output, session) {
         
         data <- subset(data, subset = year == input$slider1)
         
-        area <- (sum(data$water_area))
+        area <- (sum(data$water_area))/multiplier
         
         (tags$p(round(area,2), 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p("Water Body Area (square kms)", 
+            subtitle = tags$p(paste0("Water Area ",units), 
                               style = "font-size: 100%; margin:0; padding: 0;"),
             color = "lime", icon = icon("tint", color = 'lolo'))
         
@@ -1246,10 +1361,10 @@ server <- function(input, output, session) {
       
     }, error = function(e){
       
-      (tags$p("Something went wrong :(", 
+      (tags$p("Please try again", 
               style = "font-size: 80%;  font-weight: bold;")) %>%
         valueBox(
-          subtitle = tags$p("Please refresh app and try again.", 
+          subtitle = tags$p("Please complete your input or try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
           color = "lime", icon = icon("tint", color = 'white'))
       
@@ -1263,12 +1378,26 @@ server <- function(input, output, session) {
       
       data <- infoBoxData()
       
+      if(input$metric2 == 'meters') {
+        
+        multiplier <- 1
+        units <- '(square meters)'
+        
+      } else { 
+        
+        multiplier <- 1000000
+        units <- '(square kms)'
+        
+      }
+      
+      data <- infoBoxData()
+      
       if (is.null(data)) {
         
         (tags$p(NULL, 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p("Soil Area (square kms)", 
+            subtitle = tags$p(paste0("Soil Area ",units),  
                               style = "font-size: 100%; margin:0; padding: 0;"),
             color = "purple", icon = icon("align-center", color = 'white'))
         
@@ -1276,12 +1405,12 @@ server <- function(input, output, session) {
         
         data <- subset(data, subset = year == input$slider1)
         
-        area <- (sum(data$soil_area))
+        area <- (sum(data$soil_area))/multiplier
         
         (tags$p(round(area,2), 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p("Soil Area (square kms)", 
+            subtitle = tags$p(paste0("Soil Area ",units), 
                               style = "font-size: 100%; margin:0; padding: 0;"),
             color = "purple", icon = icon("align-center", color = 'lolo'))
         
@@ -1289,10 +1418,10 @@ server <- function(input, output, session) {
       
     }, error = function(e) {
       
-      (tags$p("Something went wrong :(", 
+      (tags$p("Please try again", 
               style = "font-size: 80%;  font-weight: bold;")) %>%
         valueBox(
-          subtitle = tags$p("Please refresh app and try again.", 
+          subtitle = tags$p("Please complete your input or try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
           color = "purple", icon = icon("align-center", color = 'white'))
       
@@ -1306,12 +1435,26 @@ server <- function(input, output, session) {
       
       data <- infoBoxData()
       
+      if(input$metric2 == 'meters') {
+        
+        multiplier <- 1
+        units <- '(square meters)'
+        
+      } else { 
+        
+        multiplier <- 1000000
+        units <- '(square kms)'
+        
+      }
+      
+      data <- infoBoxData()
+      
       if (is.null(data)) {
         
         (tags$p(NULL, 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p("Turf Area (square kms)", 
+            subtitle = tags$p(paste0("Turf Area ",units), 
                               style = "font-size: 100%; margin:0; padding: 0;"),
             color = "fuchsia", icon = icon("futbol-o", color = 'white'))
         
@@ -1319,12 +1462,12 @@ server <- function(input, output, session) {
         
         data <- subset(data, subset = year == input$slider1)
         
-        area <- (sum(data$turf_area))
+        area <- (sum(data$turf_area))/multiplier
         
         (tags$p(round(area,2), 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p("Turf Area (square kms)", 
+            subtitle = tags$p(paste0("Turf Area ",units), 
                               style = "font-size: 100%; margin:0; padding: 0;"),
             color = "fuchsia", icon = icon("futbol-o", color = 'white'))
         
@@ -1332,10 +1475,10 @@ server <- function(input, output, session) {
       
     }, error = function(e){
       
-      (tags$p("Something went wrong :(", 
+      (tags$p("Please try again", 
               style = "font-size: 80%;  font-weight: bold;")) %>%
         valueBox(
-          subtitle = tags$p("Please refresh app and try again.", 
+          subtitle = tags$p("Please complete your input or try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
           color = "fuchsia", icon = icon("futbol-o", color = 'white'))
       
@@ -1427,7 +1570,7 @@ server <- function(input, output, session) {
     
     ###END
     
-    areaRatio <- (tree_areaB+lawn_areaB+impervious_areaB+soil_areaB+
+    areaRatio <- (lawn_areaB+tree_areaB+impervious_areaB+soil_areaB+
                     water_areaB+turf_areaB) / polygon_area
     
     areaList <- list(polygon_area,lawn_area,lawn_areaB,tree_area,tree_areaB,
@@ -1610,12 +1753,17 @@ server <- function(input, output, session) {
       
       ggplot(data = MCPlotDF, aes(x=label,y=value, color = label, fill = label)) + 
         geom_boxplot(alpha = 0.3) + 
+        scale_color_manual(values=c("#FAA41A","#282C7C")) +
+        scale_fill_manual(values=c("#FAA41A","#282C7C")) +
         theme_bw() +
         labs(title = "Microclimate Impact",
              x="",
              y="Impact in Delta Degrees Celsius")+
         theme(plot.background = element_rect(fill = "#F8F8F8")) +
         theme(legend.position="none")
+      
+      #282C7C
+      #FAA41A
       
     }, error = function(e) {
       
@@ -1696,10 +1844,10 @@ server <- function(input, output, session) {
       
     }, error = function(e) {
       
-      (tags$p("Something went wrong :( ",
+      (tags$p("0",
               style = "font-size: 80%;  font-weight: bold;")) %>%
         valueBox(
-          subtitle = tags$p("Please refresh app and try again.", 
+          subtitle = tags$p("Please complete your input or try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
           color = "maroon", icon = icon("object-ungroup"))
       
@@ -1752,10 +1900,10 @@ server <- function(input, output, session) {
       
     }, error = function(e) {
       
-      (tags$p("Something went wrong :( ",
+      (tags$p("0",
               style = "font-size: 80%;  font-weight: bold;")) %>%
         valueBox(
-          subtitle = tags$p("Please refresh app and try again.", 
+          subtitle = tags$p("Please complete your input or try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
           color = "navy", icon = icon("pagelines"))
       
@@ -1808,10 +1956,10 @@ server <- function(input, output, session) {
       
     }, error = function(e){
       
-      (tags$p("Something went wrong :( ",
+      (tags$p("0",
               style = "font-size: 80%;  font-weight: bold;")) %>%
         valueBox(
-          subtitle = tags$p("Please refresh app and try again.", 
+          subtitle = tags$p("Please complete your input or try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
           color = "teal", icon = icon("tree"))
       
@@ -1864,10 +2012,10 @@ server <- function(input, output, session) {
       
     }, error = function(e) {
       
-      (tags$p("Something went wrong :( ",
+      (tags$p("0",
               style = "font-size: 80%;  font-weight: bold;")) %>%
         valueBox(
-          subtitle = tags$p("Please refresh app and try again.", 
+          subtitle = tags$p("Please complete your input or try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
           color = "olive", icon = icon("road"))
       
@@ -1876,62 +2024,6 @@ server <- function(input, output, session) {
   })
   
   output$info_box5b <- renderInfoBox({
-    
-    tryCatch({
-      
-      if(input$metric == 'meters') {
-        
-        multiplier <- 1
-        units <- '(square meters)'
-        
-      } else { 
-        
-        multiplier <- 1000000
-        units <- '(square kms)'
-        
-      }
-      
-      data <- customPolygonAreas()
-      
-      if (is.null(data)) {
-        
-        (tags$p(NULL, 
-                style = "font-size: 100%;  font-weight: bold;")) %>%
-          valueBox(
-            subtitle = tags$p(paste0("Water Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
-            color = "lime", icon = icon("tint", color = 'white'))
-        
-      } else {
-        
-        data <- customPolygonAreas()
-        
-        area <- data[[10]]/multiplier
-        finalArea <- data[[11]]/multiplier
-        
-        (tags$p(round(finalArea,2), 
-                style = "font-size: 100%;  font-weight: bold;")) %>%
-          valueBox(
-            subtitle = tags$p(paste0("Water Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
-            color = "lime", icon = icon("tint", color = 'lolo'))
-        
-      }
-      
-    }, error = function(e) {
-      
-      (tags$p("Something went wrong :( ",
-              style = "font-size: 80%;  font-weight: bold;")) %>%
-        valueBox(
-          subtitle = tags$p("Please refresh app and try again.", 
-                            style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "lime", icon = icon("tint"))
-      
-    })
-    
-  })
-  
-  output$info_box6b <- renderInfoBox({
     
     tryCatch({
       
@@ -1976,12 +2068,68 @@ server <- function(input, output, session) {
       
     }, error = function(e) {
       
-      (tags$p("Something went wrong :( ",
+      (tags$p("0",
               style = "font-size: 80%;  font-weight: bold;")) %>%
         valueBox(
-          subtitle = tags$p("Please refresh app and try again.", 
+          subtitle = tags$p("Please complete your input or try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
           color = "purple", icon = icon("align-center"))
+      
+    })
+    
+  })
+  
+  output$info_box6b <- renderInfoBox({
+    
+    tryCatch({
+      
+      if(input$metric == 'meters') {
+        
+        multiplier <- 1
+        units <- '(square meters)'
+        
+      } else { 
+        
+        multiplier <- 1000000
+        units <- '(square kms)'
+        
+      }
+      
+      data <- customPolygonAreas()
+      
+      if (is.null(data)) {
+        
+        (tags$p(NULL, 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p(paste0("Water Area ",units), 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "lime", icon = icon("tint", color = 'white'))
+        
+      } else {
+        
+        data <- customPolygonAreas()
+        
+        area <- data[[10]]/multiplier
+        finalArea <- data[[11]]/multiplier
+        
+        (tags$p(round(finalArea,2), 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p(paste0("Water Area ",units), 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "lime", icon = icon("tint", color = 'lolo'))
+        
+      }
+      
+    }, error = function(e) {
+      
+      (tags$p("0",
+              style = "font-size: 80%;  font-weight: bold;")) %>%
+        valueBox(
+          subtitle = tags$p("Please complete your input or try again.", 
+                            style = "font-size: 100%; margin:0; padding: 0;"),
+          color = "lime", icon = icon("tint"))
       
     })
     
@@ -2032,10 +2180,10 @@ server <- function(input, output, session) {
       
     }, error = function(e) {
       
-      (tags$p("Something went wrong :( ",
+      (tags$p("0",
               style = "font-size: 80%;  font-weight: bold;")) %>%
         valueBox(
-          subtitle = tags$p("Please refresh app and try again.", 
+          subtitle = tags$p("Please complete your input or try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
           color = "fuchsia", icon = icon("futbol-o", color = 'white'))
       
@@ -2107,63 +2255,6 @@ server <- function(input, output, session) {
           color = "black")
       
     })
-    
-  })
-  
-  # output$inferencePlot <- renderPlotly({
-  #   
-  #   tryCatch({
-  #     
-  #     # data <- fread('inferencePlot.csv')
-  #     # 
-  #     # ggplot(data = data, aes(x=xCoord,y=yCoord,fill = value)) + 
-  #     #   geom_tile()+ 
-  #     #   theme(legend.position='none') +
-  #     #   theme(axis.line = element_blank(),
-  #     #         panel.grid.major = element_blank(),
-  #     #         panel.grid.minor = element_blank(),
-  #     #         panel.border = element_blank(),
-  #     #         panel.background = element_blank(),
-  #     #         axis.text.x=element_blank(), #remove x axis labels
-  #     #         axis.ticks.x=element_blank(), #remove x axis ticks
-  #     #         axis.text.y=element_blank(),  #remove y axis labels
-  #     #         axis.ticks.y=element_blank()) +
-  #     #   labs(x='',y='')
-  #     
-  #   }, error = function(e){
-  #     
-  #     ggplot()
-  #     
-  #   })
-  #   
-  # })
-  
-  output$inferencePlot <- renderPlot({
-    # When input$n is 3, filename is ./images/image3.jpeg
-    
-    # data <- customPolygonAreas()
-    # 
-    # polygonArea <- data[[1]]
-    # 
-    # if (polygonArea > 0) {
-    #   
-    #   filename <- normalizePath(file.path('C:/Users/crort/OneDrive/Desktop/CapstoneProject/',
-    #                                       paste('inferenceImageCropped', input$n, '.png', sep='')))
-    #   
-    #   # Return a list containing the filename and alt text
-    #   list(src = filename,
-    #        alt = paste("Image number", input$n))
-    #   
-    # } else {
-    #   
-    #   filename <- normalizePath(file.path('C:/Users/crort/OneDrive/Desktop/CapstoneProject/',
-    #                                       paste('waitingImage', input$n, '.png', sep='')))
-    #   
-    #   # Return a list containing the filename and alt text
-    #   list(src = filename,
-    #        alt = paste("Image number", input$n))
-    #   
-    # }
     
   })
   

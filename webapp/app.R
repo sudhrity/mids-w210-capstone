@@ -21,9 +21,9 @@ library(shinyscreenshot)
 source("about.R")
 
 con <- dbConnect(odbc(),
-                 Driver='Devart ODBC Driver for PostgreSQL',
+                 # Driver='Devart ODBC Driver for PostgreSQL',
                  # ^ use on local Windows development environment
-                 # Driver='PostgreSQL',
+                 Driver='PostgreSQL',
                  # ^ Use on shinyapps.io deployment
                  Server='18.204.57.173',
                  Port='5432',
@@ -97,7 +97,7 @@ ui <- dashboardPage(
     tags$style(".small-box.bg-maroon { background-color: #D3D3D3 !important; color: #000000 !important; }"),
     tags$style(".small-box.bg-purple { background-color: #A47041 !important; color: #000000 !important; }"),
     tags$style(".small-box.bg-fuchsia { background-color: #0b9ed5 !important; color: #000000 !important; }"),
-    tags$style(".small-box.bg-purple { background-color: #282C7C !important; color: #000000 !important; }"),
+    tags$style(".small-box.bg-black { background-color: #282C7C !important; color: #000000 !important; }"),
     tags$style(".small-box.bg-orange { background-color: #FAA41A !important; color: #000000 !important; }"),
     
     tags$head(tags$style(
@@ -515,11 +515,11 @@ ui <- dashboardPage(
                  
                ),
                
-      ),
-      
-      tabPanel("How to Use UrbanInsights", 
-               
       )
+      
+      # tabPanel("How to Use UrbanInsights", 
+      #          
+      # )
     )
   )
 ) 
@@ -556,11 +556,11 @@ server <- function(input, output, session) {
     
   })
   
-  cancel.onSessionEnded <- session$onSessionEnded(function() {
-
-    dbDisconnect(con)
-
-  })
+  # cancel.onSessionEnded <- session$onSessionEnded(function() {
+  # 
+  #   dbDisconnect(con)
+  # 
+  # })
   
   output$myMap <- renderGoogle_map({
     
@@ -986,8 +986,6 @@ server <- function(input, output, session) {
     
     FastAPIobject <- gsub(substr(FastAPIobject,20,21),"Md",FastAPIobject)
     
-    print(FastAPIobject)
-    
     FastAPIobject <- as.character(FastAPIobject)
     
     request <- paste0(FastAPIlink,"/",FastAPIobject)
@@ -1033,10 +1031,9 @@ server <- function(input, output, session) {
     
     tryCatch({
       
-      ytotalDay <- microClimateInference()[[1]]
-      ytotalNight <- microClimateInference()[[4]]
+      waterStart <- waterUsageInference()[[1]]
       
-      if (is.null(ytotalDay)) {
+      if (is.null(waterStart)) {
         
         (tags$p(NULL, 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
@@ -1047,10 +1044,10 @@ server <- function(input, output, session) {
         
       } else {
         
-        (tags$p(paste0(round(ytotalDay,2),"° C"), 
+        (tags$p(paste0(round(waterStart,2)," Gal/Day"), 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p("Estimated water usage before land conversion (for grass irrigation)", 
+            subtitle = tags$p("Irrigation water usage before land conversion (gallons per day)", 
                               style = "font-size: 100%; margin:0; padding: 0;"),
             color = "lime", icon = icon("toggle-left", color = 'yellow'))
         
@@ -1073,10 +1070,9 @@ server <- function(input, output, session) {
     
     tryCatch({
       
-      ytotalDay <- microClimateInference()[[1]]
-      ytotalNight <- microClimateInference()[[4]]
+      waterEnd <- waterUsageInference()[[2]]
       
-      if (is.null(ytotalDay)) {
+      if (is.null(waterEnd)) {
         
         (tags$p(NULL, 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
@@ -1087,10 +1083,10 @@ server <- function(input, output, session) {
         
       } else {
         
-        (tags$p(paste0(round(ytotalNight,2),"° C"), 
+        (tags$p(paste0(round(waterEnd,2)," Gal/Day"), 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p("Estimated water usage after land conversion (for grass irrigation)", 
+            subtitle = tags$p("Irrigation water usage after land conversion (gallons per day)", 
                               style = "font-size: 100%; margin:0; padding: 0;"),
             color = "lime", icon = icon("toggle-right", color = 'white'))
         
@@ -1163,7 +1159,7 @@ server <- function(input, output, session) {
           valueBox(
             subtitle = tags$p("Please make a land conversion to get micrclimate estimates", 
                               style = "font-size: 100%; margin:0; padding: 0;"),
-            color = "purple", icon = icon("moon", color = 'white'))
+            color = "black", icon = icon("moon", color = 'white'))
         
       } else {
         
@@ -1172,7 +1168,7 @@ server <- function(input, output, session) {
           valueBox(
             subtitle = tags$p("Degrees Celsius night-time temperature change", 
                               style = "font-size: 100%; margin:0; padding: 0;"),
-            color = "purple", icon = icon("moon", color = 'white'))
+            color = "black", icon = icon("moon", color = 'white'))
         
       }
       
@@ -1183,7 +1179,7 @@ server <- function(input, output, session) {
         valueBox(
           subtitle = tags$p("Please complete your input or try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "purple", icon = icon("moon", color = 'white'))
+          color = "black", icon = icon("moon", color = 'white'))
       
     })
     
@@ -1624,6 +1620,26 @@ server <- function(input, output, session) {
     
   })
   
+  waterUsageInference <- reactive({
+    
+    data <- customPolygonAreas()
+       
+    waterUsage <- 0.623
+    
+    waterUsage <- (waterUsage*(input$waterQuant/100))+waterUsage
+    
+    grassAreaStart <- data[[2]] * 10.7639
+    startUsage <- waterUsage * grassAreaStart
+    
+    grassAreaEnd <- data[[3]] * 10.7639
+    endUsage <- waterUsage * grassAreaEnd
+    
+    waterStats <- list(startUsage, endUsage)
+    
+    return(waterStats)
+    
+  })
+  
   microClimateInference <- reactive({
     
     data <- customPolygonAreas()
@@ -1804,9 +1820,6 @@ server <- function(input, output, session) {
              y="Impact in Delta Degrees Celsius")+
         theme(plot.background = element_rect(fill = "#F8F8F8")) +
         theme(legend.position="none")
-      
-      #282C7C
-      #FAA41A
       
     }, error = function(e) {
       

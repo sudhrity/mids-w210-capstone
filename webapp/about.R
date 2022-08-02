@@ -2,7 +2,7 @@
 AboutPage <- '<!DOCTYPE html>
 <html lang="en">
 <head>
-<title>UrbanInsights</title>
+<title>Urban Insights</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
@@ -39,7 +39,7 @@ body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
 
 <!-- Header -->
 <header class="w3-container w3-gray w3-center" style="padding:128px 16px">
-  <h1 class="w3-margin w3-jumbo">UrbanInsights</h1>
+  <h1 class="w3-margin w3-jumbo">Urban Insights</h1>
   <p class="w3-xlarge">Making better decisions, one pixel at a time!</p>
   <button class="w3-button w3-gray w3-padding-large w3-large w3-margin-top">A W210 Capstone Project</button>
 </header>
@@ -49,11 +49,13 @@ body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
   <div class="w3-content">
     <div class="w3-twothird">
       <h1>Our Technology</h1>
-      <h5 class="w3-padding-32">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h5>
+      <h5 class="w3-padding-32">Our mission is to identify irrigated vegetation including lawns and trees along with other landscapes including water, soil, and impervious surfaces. Using geographical data, aerial imagery, and advanced AI and ML techniques, the primary objective is to provide insights drive policies and plans aimed at reducing water usage with minimal adverse effects on urban micro climate and accounting for median household income in the process.</h5>
 
-      <p class="w3-text-grey">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Excepteur sint
-        occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-        laboris nisi ut aliquip ex ea commodo consequat.</p>
+      <p class="w3-text-grey">Our dataset is accessed via the Google Earth Engine API, comprising of aerial imagery. We have used the image data from National Agricultural Imagery set. It consists of red, green, blue and near infrared bands. Using these 4 bands, we performed transformations and manipulations to access additional characteristics used as features in our model. Combining this with our few other datasets such as US Census Data, Land Surface Temperature and Emissivity Data.
+
+Our model focuses on the County of Los Angeles. With the variability in terrain types, socioeconomic distribution and overall diversity, LA serves as a perfect study area.
+
+We have trained our data on Los Angeles county in California, USA.</p>
     </div>
 
     <div class="w3-third w3-center">
@@ -71,11 +73,11 @@ body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
 
     <div class="w3-twothird">
       <h1>Use Cases</h1>
-      <h5 class="w3-padding-32">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h5>
+      <h5 class="w3-padding-32">Urban Insights uses Google Earth Engine API and Tensor Flow models.</h5>
 
-      <p class="w3-text-grey">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Excepteur sint
-        occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-        laboris nisi ut aliquip ex ea commodo consequat.</p>
+      <p class="w3-text-grey">Our final model is an ensemble of two neural network sub-models, that takes the most confident estimate, or highest probability class, among the sub-models during classification. A representation of the ensemble model architecture is shown on the right, and the hyperparameters are shown on left. The two neural network sub-models share the same architecture and were trained using the same hyperparameters. Each model is a 3 layer model, with a dropout layer between each hidden layer. Each hidden layer has 32 nodes and the activation functions are ReLU functions. The difference between the two models is that the first model was trained on a single water class, whereas the second model was trained on additional data for an additional water class, where water was separated into pool and lake classes. When the highest probabilities are taken for each sub-model, these classes are mapped back as a single water class for classification.
+
+The separation of these classes allowed the second model, and consequently our ensemble model, to perform better overall on water, given the variance in NDVI values for different types of water.</p>
     </div>
   </div>
 </div>

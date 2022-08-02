@@ -206,7 +206,7 @@ ui <- dashboardPage(
                         box(width = 8,
                             
                             column(width = 6,
-                                   textInput("address", label = "Please type in a reference address: "),
+                                   textInput("address", label = "Please type in a reference address or click on submit address to start: "),
                                    value = '900 Wilshire Blvd, Los Angeles, CA 90017, United States'),
                             
                             column(width = 2,
@@ -251,20 +251,20 @@ ui <- dashboardPage(
                             h3("Microclimate Impact Analysis"),
                             
                             hr(),
-                            
-                            column(width = 8,
-                                   
-                                   selectInput('inferenceModel', h5("Select which model data to use for estimates:"),
-                                               choices = c('Random Forest Model','TensorFlow Model'),
-                                               selected = 'Random Forest Model',
-                                               multiple = FALSE),
-                                   
-                            ),
-                            
+                        
                             column(width = 12,
                                    
                                    valueBoxOutput("MCinfoBox1", width = 6),
                                    valueBoxOutput("MCinfoBox2", width = 6),
+                                   
+                                   column(width = 12,
+                                          
+                                          selectInput('inferenceModel', h5("Select which model data to use for microclimate estimates:"),
+                                                      choices = c('Random Forest Model','TensorFlow Model'),
+                                                      selected = 'Random Forest Model',
+                                                      multiple = FALSE),
+                                          
+                                   ),
                                    
                                    column(width = 6,
                                           
@@ -285,7 +285,32 @@ ui <- dashboardPage(
                             
                             h3("Water Impact Analysis"),
                             
-                            plotlyOutput('testPlot2', height = 500), 
+                            hr(),
+                            
+                            column(width = 12,
+                                   
+                                   valueBoxOutput("H2OinfoBox1", width = 6),
+                                   valueBoxOutput("H2OinfoBox2", width = 6),
+                                   
+                                   column(width = 12,
+                                          
+                                          sliderInput("waterQuant", HTML("<h5>Adjust watering default value of 0.623 gallons of water per square foot <br>(change in % from default):</h5>"),
+                                                      min = -100, max = 100, value = 0, step = 1)
+                                          
+                                   ),
+                                   
+                                   column(width = 6,
+                                          
+                                          htmlOutput("waterOutputs")
+                                          
+                                   ),
+                                   
+                                   column(width = 6,
+                                          
+                                          plotlyOutput('WaterPlot')
+                                          
+                                   ),
+                            ), 
                             
                         ),
                  ),
@@ -531,72 +556,10 @@ server <- function(input, output, session) {
     
   })
   
-  # cancel.onSessionEnded <- session$onSessionEnded(function() {
-  #   
-  #   dbDisconnect(con)
-  #   
-  # })
-  
-  output$testPlot1 <- renderPlotly({
-    
-    # data <- customPolygonAreas()
-    # 
-    # polygonArea <- data[[1]]
-    # 
-    # lawnArea <- input$slider1a
-    # 
-    # areaRatio <- round(data[[14]],1)
-    # 
-    # if (polygonArea > 0 & lawnArea == -100 & areaRatio >= 0.99) {
-    #   
-    #   waterData <- fread('C:/Users/crort/OneDrive/Desktop/CapstoneProject/waterData.csv')
-    #   
-    #   waterData$label <- factor(waterData$label,
-    #                          levels = c('waterUsageBefore','waterUsageAfter'),
-    #                          ordered = TRUE)
-    #   
-    #   ggplot(data = waterData, aes(x=label,y=value, fill = waterData$color, alpha = 0.5)) + 
-    #     geom_boxplot() +
-    #     scale_fill_manual(values=c("#1045b6", "#66ccff")) + 
-    #     labs(
-    #       title = 'Land conversion expected water usage change',
-    #       x='category',
-    #       y='average water usage gallons per sq foot per day'
-    #     )  +
-    #     theme_bw() +
-    #     theme(legend.position="none") 
-    #   
-    # }
-    
-  })
-  
-  output$testPlot2 <- renderPlotly({
-    
-    # data <- customPolygonAreas()
-    # 
-    # polygonArea <- data[[1]]
-    # 
-    # lawnArea <- input$slider1a
-    # 
-    # areaRatio <- round(data[[14]],1)
-    # 
-    # if (polygonArea > 0 & lawnArea == -100 & areaRatio >= 0.99) {
-    #   
-    #   weatherData <- fread('C:/Users/crort/OneDrive/Desktop/CapstoneProject/weatherData.csv')
-    #   
-    #   ggplot(data = weatherData, aes(x=label,y=value, fill = weatherData$color, alpha = 0.5)) + 
-    #     geom_boxplot() +
-    #     scale_fill_manual(values=c("#FDB813", "#131862")) + 
-    #     labs(
-    #       title = 'Land conversion expected temperature change',
-    #       x='category',
-    #       y='mean temperature May/June/July in Celsius'
-    #     )  +
-    #     theme_bw() +
-    #     theme(legend.position="none") 
-    #   
-    # }
-    
+  cancel.onSessionEnded <- session$onSessionEnded(function() {
+
+    dbDisconnect(con)
+
   })
   
   output$myMap <- renderGoogle_map({
@@ -1063,6 +1026,86 @@ server <- function(input, output, session) {
     data <- subset(data, subset = zipcode %in% input$specifyPolygon)
     
     return(data)
+    
+  })
+  
+  output$H2OinfoBox1 <- renderInfoBox({
+    
+    tryCatch({
+      
+      ytotalDay <- microClimateInference()[[1]]
+      ytotalNight <- microClimateInference()[[4]]
+      
+      if (is.null(ytotalDay)) {
+        
+        (tags$p(NULL, 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p("Please make a land conversion to get water usage estimates", 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "lime", icon = icon("toggle-left", color = 'yellow'))
+        
+      } else {
+        
+        (tags$p(paste0(round(ytotalDay,2),"° C"), 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p("Estimated water usage before land conversion (for grass irrigation)", 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "lime", icon = icon("toggle-left", color = 'yellow'))
+        
+      }
+      
+    }, error = function(e) {
+      
+      (tags$p("Please try again", 
+              style = "font-size: 80%;  font-weight: bold;")) %>%
+        valueBox(
+          subtitle = tags$p("Please complete your input or try again.", 
+                            style = "font-size: 100%; margin:0; padding: 0;"),
+          color = "lime", icon = icon("toggle-left", color = 'yellow'))
+      
+    })
+    
+  })
+  
+  output$H2OinfoBox2 <- renderInfoBox({
+    
+    tryCatch({
+      
+      ytotalDay <- microClimateInference()[[1]]
+      ytotalNight <- microClimateInference()[[4]]
+      
+      if (is.null(ytotalDay)) {
+        
+        (tags$p(NULL, 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p("Please make a land conversion to get water usage estimates", 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "lime", icon = icon("toggle-right", color = 'white'))
+        
+      } else {
+        
+        (tags$p(paste0(round(ytotalNight,2),"° C"), 
+                style = "font-size: 100%;  font-weight: bold;")) %>%
+          valueBox(
+            subtitle = tags$p("Estimated water usage after land conversion (for grass irrigation)", 
+                              style = "font-size: 100%; margin:0; padding: 0;"),
+            color = "lime", icon = icon("toggle-right", color = 'white'))
+        
+      }
+      
+    }, error = function(e) {
+      
+      (tags$p("Please try again", 
+              style = "font-size: 80%;  font-weight: bold;")) %>%
+        valueBox(
+          subtitle = tags$p("Please complete your input or try again.", 
+                            style = "font-size: 100%; margin:0; padding: 0;"),
+          color = "lime", icon = icon("toggle-right", color = 'white'))
+      
+    })
     
   })
   

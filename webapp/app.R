@@ -206,7 +206,7 @@ ui <- dashboardPage(
                         box(width = 8,
                             
                             column(width = 6,
-                                   textInput("address", label = "Please type in a reference address or click on submit address to start: "),
+                                   textInput("address", label = HTML("<h5>Please type in a reference address or click on submit address to start:</h5> <h6>To draw polygon, after map displays, use the draw polygon tool located at the top right corner of the map.</h6>")),
                                    value = '900 Wilshire Blvd, Los Angeles, CA 90017, United States'),
                             
                             column(width = 2,
@@ -215,7 +215,7 @@ ui <- dashboardPage(
                             column(width = 2,
                                    
                                    selectInput('metric', h5("Select units for area"),
-                                               choices = c('meters','kilometers'),
+                                               choices = c('sq. meters','sq. kilometers'),
                                                selected = 'meters',
                                                multiple = FALSE),
                                    
@@ -294,7 +294,7 @@ ui <- dashboardPage(
                                    
                                    column(width = 12,
                                           
-                                          sliderInput("waterQuant", HTML("<h5>Adjust watering default value of 0.623 gallons of water per square foot <br>(change in % from default):</h5>"),
+                                          sliderInput("waterQuant", HTML("<h5>Adjust watering default value of 0.623 gallons of water per sq. foot <br>(change in % from default):</h5>"),
                                                       min = -100, max = 100, value = 0, step = 1)
                                           
                                    ),
@@ -354,7 +354,7 @@ ui <- dashboardPage(
                         column(width = 2,
                                
                                selectInput('metric2', h5("Select units for area"),
-                                           choices = c('meters','kilometers'),
+                                           choices = c('sq. meters','sq. kilometers'),
                                            selected = 'meters',
                                            multiple = FALSE),
                                
@@ -390,9 +390,9 @@ ui <- dashboardPage(
                  
                  tabsetPanel(
                    
-                   tabPanel("Basic Insights",
-                            
-                   ),
+                   # tabPanel("Basic Insights",
+                   #          
+                   # ),
                    
                    tabPanel("Advanced Insights (Regression Panel)",
                             
@@ -556,11 +556,11 @@ server <- function(input, output, session) {
     
   })
   
-  # cancel.onSessionEnded <- session$onSessionEnded(function() {
-  # 
-  #   dbDisconnect(con)
-  # 
-  # })
+  cancel.onSessionEnded <- session$onSessionEnded(function() {
+
+    dbDisconnect(con)
+
+  })
   
   output$myMap <- renderGoogle_map({
     
@@ -1033,9 +1033,9 @@ server <- function(input, output, session) {
       
       waterStart <- waterUsageInference()[[1]]
       
-      if (is.null(waterStart)) {
+      if (waterStart==0) {
         
-        (tags$p(NULL, 
+        (tags$p("Polygon selection", 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
             subtitle = tags$p("Please make a land conversion to get water usage estimates", 
@@ -1047,8 +1047,8 @@ server <- function(input, output, session) {
         (tags$p(paste0(round(waterStart,2)," Gal/Day"), 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p("Irrigation water usage before land conversion (gallons per day)", 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p("Irrigation water usage before conversion", 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "lime", icon = icon("toggle-left", color = 'yellow'))
         
       }
@@ -1070,25 +1070,43 @@ server <- function(input, output, session) {
     
     tryCatch({
       
+      waterStart <- waterUsageInference()[[1]]
       waterEnd <- waterUsageInference()[[2]]
       
-      if (is.null(waterEnd)) {
+      waterEnd <- waterStart - waterEnd 
+      
+      if (waterEnd == 0 & input$slider1a == 0) {
         
-        (tags$p(NULL, 
+        print(paste0("A:",waterEnd))
+        
+        (tags$p("Land conversion", 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p("Please make a land conversion to get water usage estimates", 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
-            color = "lime", icon = icon("toggle-right", color = 'white'))
+            subtitle = tags$p("Please make a grass land conversion to get water saving estimates", 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
+            color = "green", icon = icon("toggle-right", color = 'white'))
         
       } else {
         
-        (tags$p(paste0(round(waterEnd,2)," Gal/Day"), 
-                style = "font-size: 100%;  font-weight: bold;")) %>%
-          valueBox(
-            subtitle = tags$p("Irrigation water usage after land conversion (gallons per day)", 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
-            color = "lime", icon = icon("toggle-right", color = 'white'))
+        if (waterEnd > 0) {
+          
+          (tags$p(paste0(round(waterEnd,2)," Gal/Day"), 
+                  style = "font-size: 100%;  font-weight: bold;")) %>%
+            valueBox(
+              subtitle = tags$p("Water savings after conversion", 
+                                style = "font-size: 120%; margin:0; padding: 0;"),
+              color = "green", icon = icon("toggle-right", color = 'white'))
+          
+          
+        } else if (waterEnd < 0) {
+          
+          (tags$p(paste0(round(abs(waterEnd),2)," Gal/Day"), 
+                  style = "font-size: 100%;  font-weight: bold;")) %>%
+            valueBox(
+              subtitle = tags$p("Increased water consumption after conversion", 
+                                style = "font-size: 120%; margin:0; padding: 0;"),
+              color = "red", icon = icon("toggle-right", color = 'white'))
+        }
         
       }
       
@@ -1099,7 +1117,7 @@ server <- function(input, output, session) {
         valueBox(
           subtitle = tags$p("Please complete your input or try again.", 
                             style = "font-size: 100%; margin:0; padding: 0;"),
-          color = "lime", icon = icon("toggle-right", color = 'white'))
+          color = "green", icon = icon("toggle-right", color = 'white'))
       
     })
     
@@ -1112,12 +1130,12 @@ server <- function(input, output, session) {
       ytotalDay <- microClimateInference()[[1]]
       ytotalNight <- microClimateInference()[[4]]
       
-      if (is.null(ytotalDay)) {
+      if (is.nan(ytotalDay)) {
         
-        (tags$p(NULL, 
+        (tags$p('Land conversion', 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p("Please make a land conversion to get micrclimate estimates", 
+            subtitle = tags$p("Please make a land conversion to get microclimate estimates", 
                               style = "font-size: 100%; margin:0; padding: 0;"),
             color = "orange", icon = icon("sun", color = 'yellow'))
         
@@ -1152,9 +1170,9 @@ server <- function(input, output, session) {
       ytotalDay <- microClimateInference()[[1]]
       ytotalNight <- microClimateInference()[[4]]
       
-      if (is.null(ytotalDay)) {
+      if (is.nan(ytotalDay)) {
         
-        (tags$p(NULL, 
+        (tags$p('Land conversion', 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
             subtitle = tags$p("Please make a land conversion to get micrclimate estimates", 
@@ -1191,15 +1209,15 @@ server <- function(input, output, session) {
       
       data <- infoBoxData()
       
-      if(input$metric2 == 'meters') {
+      if(input$metric2 == 'sq. meters') {
         
         multiplier <- 1
-        units <- '(square meters)'
+        units <- '(sq. meters)'
         
       } else { 
         
         multiplier <- 1000000
-        units <- '(square kms)'
+        units <- '(sq. kms)'
         
       }
       
@@ -1208,8 +1226,8 @@ server <- function(input, output, session) {
         (tags$p(NULL, 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p(paste0("Grass Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p(paste0("Grass ",units), 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "navy", icon = icon("pagelines", color = 'white'))
         
       } else {
@@ -1221,8 +1239,8 @@ server <- function(input, output, session) {
         (tags$p(round(area,2), 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p(paste0("Grass Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p(paste0("Grass ",units), 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "navy", icon = icon("pagelines", color = 'lolo'))
         
       }
@@ -1246,15 +1264,15 @@ server <- function(input, output, session) {
       
       data <- infoBoxData()
       
-      if(input$metric2 == 'meters') {
+      if(input$metric2 == 'sq. meters') {
         
         multiplier <- 1
-        units <- '(square meters)'
+        units <- '(sq. meters)'
         
       } else { 
         
         multiplier <- 1000000
-        units <- '(square kms)'
+        units <- '(sq. kms)'
         
       }
       
@@ -1265,8 +1283,8 @@ server <- function(input, output, session) {
         (tags$p(NULL, 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p(paste0("Tree Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p(paste0("Tree ",units), 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "teal", icon = icon("tree", color = 'white'))
         
       } else {
@@ -1278,8 +1296,8 @@ server <- function(input, output, session) {
         (tags$p(round(area,2), 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p(paste0("Tree Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p(paste0("Tree ",units), 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "teal", icon = icon("tree", color = 'lolo'))
         
       }
@@ -1303,15 +1321,15 @@ server <- function(input, output, session) {
       
       data <- infoBoxData()
       
-      if(input$metric2 == 'meters') {
+      if(input$metric2 == 'sq. meters') {
         
         multiplier <- 1
-        units <- '(square meters)'
+        units <- '(sq. meters)'
         
       } else { 
         
         multiplier <- 1000000
-        units <- '(square kms)'
+        units <- '(sq. kms)'
         
       }
       
@@ -1322,8 +1340,8 @@ server <- function(input, output, session) {
         (tags$p(NULL, 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p(paste0("Impervious Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p(paste0("Impervious ",units), 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "olive", icon = icon("road", color = 'white'))
         
       } else {
@@ -1335,8 +1353,8 @@ server <- function(input, output, session) {
         (tags$p(round(area,2), 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p(paste0("Impervious Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p(paste0("Impervious ",units), 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "olive", icon = icon("road", color = 'lolo'))
         
       }
@@ -1360,15 +1378,15 @@ server <- function(input, output, session) {
       
       data <- infoBoxData()
       
-      if(input$metric2 == 'meters') {
+      if(input$metric2 == 'sq. meters') {
         
         multiplier <- 1
-        units <- '(square meters)'
+        units <- '(sq. meters)'
         
       } else { 
         
         multiplier <- 1000000
-        units <- '(square kms)'
+        units <- '(sq. kms)'
         
       }
       
@@ -1379,8 +1397,8 @@ server <- function(input, output, session) {
         (tags$p(NULL, 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tagstags$p(paste0("Water Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tagstags$p(paste0("Water ",units), 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "lime", icon = icon("tint", color = 'white'))
         
       } else {
@@ -1392,8 +1410,8 @@ server <- function(input, output, session) {
         (tags$p(round(area,2), 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p(paste0("Water Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p(paste0("Water ",units), 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "lime", icon = icon("tint", color = 'lolo'))
         
       }
@@ -1417,15 +1435,15 @@ server <- function(input, output, session) {
       
       data <- infoBoxData()
       
-      if(input$metric2 == 'meters') {
+      if(input$metric2 == 'sq. meters') {
         
         multiplier <- 1
-        units <- '(square meters)'
+        units <- '(sq. meters)'
         
       } else { 
         
         multiplier <- 1000000
-        units <- '(square kms)'
+        units <- '(sq. kms)'
         
       }
       
@@ -1436,8 +1454,8 @@ server <- function(input, output, session) {
         (tags$p(NULL, 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p(paste0("Soil Area ",units),  
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p(paste0("Soil ",units),  
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "purple", icon = icon("align-center", color = 'white'))
         
       } else {
@@ -1449,8 +1467,8 @@ server <- function(input, output, session) {
         (tags$p(round(area,2), 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p(paste0("Soil Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p(paste0("Soil ",units), 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "purple", icon = icon("align-center", color = 'lolo'))
         
       }
@@ -1474,15 +1492,15 @@ server <- function(input, output, session) {
       
       data <- infoBoxData()
       
-      if(input$metric2 == 'meters') {
+      if(input$metric2 == 'sq. meters') {
         
         multiplier <- 1
-        units <- '(square meters)'
+        units <- '(sq. meters)'
         
       } else { 
         
         multiplier <- 1000000
-        units <- '(square kms)'
+        units <- '(sq. kms)'
         
       }
       
@@ -1493,8 +1511,8 @@ server <- function(input, output, session) {
         (tags$p(NULL, 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p(paste0("Turf Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p(paste0("Turf ",units), 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "fuchsia", icon = icon("futbol-o", color = 'white'))
         
       } else {
@@ -1506,8 +1524,8 @@ server <- function(input, output, session) {
         (tags$p(round(area,2), 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p(paste0("Turf Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p(paste0("Turf ",units), 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "fuchsia", icon = icon("futbol-o", color = 'white'))
         
       }
@@ -1862,15 +1880,15 @@ server <- function(input, output, session) {
       
       data <- customPolygonAreas()
       
-      if(input$metric == 'meters') {
+      if(input$metric == 'sq. meters') {
         
         multiplier <- 1
-        units <- '(square meters)'
+        units <- '(sq. meters)'
         
       } else { 
         
         multiplier <- 1000000
-        units <- '(square kms)'
+        units <- '(sq. kms)'
         
       }
       
@@ -1879,8 +1897,8 @@ server <- function(input, output, session) {
         (tags$p(NULL, 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p(paste0("Polygon Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p(paste0("Polygon ",units), 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "maroon", icon = icon("object-ungroup", color = 'white'))
         
       } else {
@@ -1892,8 +1910,8 @@ server <- function(input, output, session) {
         (tags$p(round(area,2), 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p(paste0("Polygon Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p(paste0("Polygon ",units), 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "maroon", icon = icon("object-ungroup", color = 'lolo'))
         
       }
@@ -1915,15 +1933,15 @@ server <- function(input, output, session) {
     
     tryCatch({
       
-      if(input$metric == 'meters') {
+      if(input$metric == 'sq. meters') {
         
         multiplier <- 1
-        units <- '(square meters)'
+        units <- '(sq. meters)'
         
       } else { 
         
         multiplier <- 1000000
-        units <- '(square kms)'
+        units <- '(sq. kms)'
         
       }
       
@@ -1934,8 +1952,8 @@ server <- function(input, output, session) {
         (tags$p(NULL, 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p(paste0("Grass Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p(paste0("Grass ",units), 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "navy", icon = icon("pagelines", color = 'white'))
         
       } else {
@@ -1948,8 +1966,8 @@ server <- function(input, output, session) {
         (tags$p(round(finalArea,2), 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p(paste0("Grass Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p(paste0("Grass ",units), 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "navy", icon = icon("pagelines", color = 'lolo'))
         
       }
@@ -1971,15 +1989,15 @@ server <- function(input, output, session) {
     
     tryCatch({
       
-      if(input$metric == 'meters') {
+      if(input$metric == 'sq. meters') {
         
         multiplier <- 1
-        units <- '(square meters)'
+        units <- '(sq. meters)'
         
       } else { 
         
         multiplier <- 1000000
-        units <- '(square kms)'
+        units <- '(sq. kms)'
         
       }
       
@@ -1990,8 +2008,8 @@ server <- function(input, output, session) {
         (tags$p(NULL, 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p(paste0("Tree Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p(paste0("Tree ",units), 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "teal", icon = icon("tree", color = 'white'))
         
       } else {
@@ -2004,8 +2022,8 @@ server <- function(input, output, session) {
         (tags$p(round(finalArea,2), 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p(paste0("Tree Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p(paste0("Tree ",units), 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "teal", icon = icon("tree", color = 'lolo'))
         
       }
@@ -2027,15 +2045,15 @@ server <- function(input, output, session) {
     
     tryCatch({
       
-      if(input$metric == 'meters') {
+      if(input$metric == 'sq. meters') {
         
         multiplier <- 1
-        units <- '(square meters)'
+        units <- '(sq. meters)'
         
       } else { 
         
         multiplier <- 1000000
-        units <- '(square kms)'
+        units <- '(sq. kms)'
         
       }
       
@@ -2046,8 +2064,8 @@ server <- function(input, output, session) {
         (tags$p(NULL, 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p(paste0("Impervious Area ",units),  
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p(paste0("Impervious ",units),  
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "olive", icon = icon("road", color = 'white'))
         
       } else {
@@ -2060,8 +2078,8 @@ server <- function(input, output, session) {
         (tags$p(round(finalArea,2), 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p(paste0("Impervious Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p(paste0("Impervious ",units), 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "olive", icon = icon("road", color = 'lolo'))
         
       }
@@ -2083,15 +2101,15 @@ server <- function(input, output, session) {
     
     tryCatch({
       
-      if(input$metric == 'meters') {
+      if(input$metric == 'sq. meters') {
         
         multiplier <- 1
-        units <- '(square meters)'
+        units <- '(sq. meters)'
         
       } else { 
         
         multiplier <- 1000000
-        units <- '(square kms)'
+        units <- '(sq. kms)'
         
       }
       
@@ -2102,8 +2120,8 @@ server <- function(input, output, session) {
         (tags$p(NULL, 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p(paste0("Soil Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p(paste0("Soil ",units), 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "purple", icon = icon("align-center", color = 'white'))
         
       } else {
@@ -2116,8 +2134,8 @@ server <- function(input, output, session) {
         (tags$p(round(finalArea,2), 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p(paste0("Soil Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p(paste0("Soil ",units), 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "purple", icon = icon("align-center", color = 'lolo'))
         
       }
@@ -2139,15 +2157,15 @@ server <- function(input, output, session) {
     
     tryCatch({
       
-      if(input$metric == 'meters') {
+      if(input$metric == 'sq. meters') {
         
         multiplier <- 1
-        units <- '(square meters)'
+        units <- '(sq. meters)'
         
       } else { 
         
         multiplier <- 1000000
-        units <- '(square kms)'
+        units <- '(sq. kms)'
         
       }
       
@@ -2158,8 +2176,8 @@ server <- function(input, output, session) {
         (tags$p(NULL, 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p(paste0("Water Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p(paste0("Water ",units), 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "lime", icon = icon("tint", color = 'white'))
         
       } else {
@@ -2172,8 +2190,8 @@ server <- function(input, output, session) {
         (tags$p(round(finalArea,2), 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p(paste0("Water Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p(paste0("Water ",units), 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "lime", icon = icon("tint", color = 'lolo'))
         
       }
@@ -2195,15 +2213,15 @@ server <- function(input, output, session) {
     
     tryCatch({
       
-      if(input$metric == 'meters') {
+      if(input$metric == 'sq. meters') {
         
         multiplier <- 1
-        units <- '(square meters)'
+        units <- '(sq. meters)'
         
       } else { 
         
         multiplier <- 1000000
-        units <- '(square kms)'
+        units <- '(sq. kms)'
         
       }
       
@@ -2214,8 +2232,8 @@ server <- function(input, output, session) {
         (tags$p(NULL, 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p(paste0("Turf Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p(paste0("Turf ",units), 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "fuchsia", icon = icon("futbol-o", color = 'white'))
         
       } else {
@@ -2228,8 +2246,8 @@ server <- function(input, output, session) {
         (tags$p(round(finalArea,2), 
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
-            subtitle = tags$p(paste0("Turf Area ",units), 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+            subtitle = tags$p(paste0("Turf ",units), 
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "fuchsia", icon = icon("futbol-o", color = 'white'))
         
       }
@@ -2251,15 +2269,15 @@ server <- function(input, output, session) {
     
     tryCatch({
       
-      if(input$metric == 'meters') {
+      if(input$metric == 'sq. meters') {
         
         multiplier <- 1
-        units <- '(square meters)'
+        units <- '(sq. meters)'
         
       } else { 
         
         multiplier <- 1000000
-        units <- '(square kms)'
+        units <- '(sq. kms)'
         
       }
       
@@ -2271,7 +2289,7 @@ server <- function(input, output, session) {
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
             subtitle = tags$p("Total transformed area", 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = "black")
         
       } else {
@@ -2296,7 +2314,7 @@ server <- function(input, output, session) {
                 style = "font-size: 100%;  font-weight: bold;")) %>%
           valueBox(
             subtitle = tags$p("Total transformed area", 
-                              style = "font-size: 100%; margin:0; padding: 0;"),
+                              style = "font-size: 120%; margin:0; padding: 0;"),
             color = as.character(boxColor))
         
       }
@@ -2304,10 +2322,10 @@ server <- function(input, output, session) {
     }, error = function(e) {
       
       (tags$p("Draw a polygon", 
-              style = "font-size: 100%;  font-weight: bold;")) %>%
+              style = "font-size: 50%;  font-weight: bold;")) %>%
         valueBox(
-          subtitle = tags$p("Total transformed area", 
-                            style = "font-size: 100%; margin:0; padding: 0;"),
+          subtitle = tags$p("To start, type in a reference address in Los Anegeles Country or just click on submit address to start:", 
+                            style = "font-size: 90%; margin:0; padding: 0;"),
           color = "black")
       
     })

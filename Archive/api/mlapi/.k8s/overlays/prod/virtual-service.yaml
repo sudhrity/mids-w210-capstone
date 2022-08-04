@@ -1,0 +1,28 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: project
+spec:
+  hosts:
+  - sudhrity.mids-w255.com
+  gateways:
+  - istio-ingress/sudhrity-gateway
+  http:
+  - match:
+    - uri:
+        exact: /predict
+    - uri:
+        exact: /predict2
+    - uri:
+        prefix: /health
+    - uri:
+        prefix: /
+    - uri:
+        prefix: /docs
+    - uri:
+        prefix: /openapi.json
+    route:
+    - destination:
+        host: project
+        port:
+          number: 8000

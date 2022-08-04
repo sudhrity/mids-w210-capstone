@@ -17,7 +17,6 @@ Includes regression model code and plots used for analysis and for our research 
 Includes HTML code for our website.
 
 <br>
-<br>
 
 ### Contributors
 

@@ -13,7 +13,7 @@ Includes code for the [Insights Analyzer](https://carlos-ortiz.shinyapps.io/weba
 ## [PanelDataModels](./PanelDataModels)
 Includes regression model code and plots used for analysis and for our research paper.
 
-## [www / html] (./www/html)
+## [html] (./www/html)
 Includes HTML code for our website.
 
 <br>

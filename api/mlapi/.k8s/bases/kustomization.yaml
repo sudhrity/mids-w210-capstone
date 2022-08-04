@@ -1,8 +1,0 @@
-namespace: sudhrity
-resources:
-- config-map.yaml
-- persistent-volume.yaml
-- deployment-project.yaml
-- deployment-redis.yaml
-- service-project.yaml
-- service-redis.yaml

@@ -1,9 +1,0 @@
-namespace: sudhrity
-bases:
-- ../../bases
-resources: 
-  - virtual-service.yaml
-patches:
-- path: patch-deployment-project.yaml
-  target:
-    kind: Deployment

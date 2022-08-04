@@ -25,11 +25,11 @@ con <- dbConnect(odbc(),
                  # ^ use on local Windows development environment
                  Driver='PostgreSQL',
                  # ^ Use on shinyapps.io deployment
-                 Server='18.204.57.173',
-                 Port='5432',
+                 Server='obscured',
+                 Port='obscured',
                  Database='postgres',
                  Uid='postgres',
-                 Pwd='&j>n!_nL]k&wWdE>*TVds4P6')
+                 Pwd='obscured')
 
 
 features <- c('polygon_area','water_area','lawn_area','tree_area','pv_area',
@@ -42,7 +42,7 @@ climateFeature <- c("lst_day_mean","lst_day_max","lst_day_min","lst_night_mean",
 
 options(shiny.reactlog = TRUE)
 
-api_key <- "AIzaSyCBjR3FHdXlv8gCetNC5j1D507UzC6Y_dM"
+api_key <- "obscured"
 
 polygonTypes <- c('State','County','Zip Code','City','Parcel')
 
